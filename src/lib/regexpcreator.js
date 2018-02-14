@@ -75,8 +75,9 @@ class RegExpCreator {
   /**
    * @typedef RegExpCreator~options
    * @type {object.<string>}
-   * @property {boolean} [diacritics=true] - If diacritic characters should be
-   * matched. ({@link https://en.wikipedia.org/wiki/Diacritic Diacritics})
+   * @property {boolean} [diacritics={}] - If diacritic characters should be
+   * matched, a mapping splitted into object parts lower/upper/none must be
+   * provided here. ({@link https://en.wikipedia.org/wiki/Diacritic Diacritics})
    * @property {object} [synonyms] - An object with synonyms. The key will be
    * a synonym for the value and the value for the key
    * @property {RegExpCreator~accuracy} [accuracy]
@@ -93,7 +94,7 @@ class RegExpCreator {
    */
   constructor(options) {
     this.opt = Object.assign({}, {
-      'diacritics': true,
+      'diacritics': {},
       'synonyms': {},
       'accuracy': 'partially',
       'caseSensitive': false,
@@ -120,7 +121,7 @@ class RegExpCreator {
     if (this.opt.ignoreJoiners || this.opt.ignorePunctuation.length) {
       str = this.setupIgnoreJoinersRegExp(str);
     }
-    if (this.opt.diacritics) {
+    if (Object.keys(this.opt.diacritics).length) {
       str = this.createDiacriticsRegExp(str);
     }
     str = this.createMergedBlanksRegExp(str);
@@ -281,30 +282,16 @@ class RegExpCreator {
   }
 
   /**
-   * Creates a regular expression string to match diacritics
+   * Creates a regular expression string to match the diacritics provided
+   * via the options
    * @param  {string} str - The search term to be used
    * @return {string}
    */
   createDiacriticsRegExp(str) {
     const sens = this.opt.caseSensitive ? '' : 'i',
-      dct = this.opt.caseSensitive ? [
-        'aàáảãạăằắẳẵặâầấẩẫậäåāą', 'AÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÄÅĀĄ',
-        'cçćč', 'CÇĆČ', 'dđď', 'DĐĎ',
-        'eèéẻẽẹêềếểễệëěēę', 'EÈÉẺẼẸÊỀẾỂỄỆËĚĒĘ',
-        'iìíỉĩịîïī', 'IÌÍỈĨỊÎÏĪ', 'lł', 'LŁ', 'nñňń',
-        'NÑŇŃ', 'oòóỏõọôồốổỗộơởỡớờợöøō', 'OÒÓỎÕỌÔỒỐỔỖỘƠỞỠỚỜỢÖØŌ',
-        'rř', 'RŘ', 'sšśșş', 'SŠŚȘŞ',
-        'tťțţ', 'TŤȚŢ', 'uùúủũụưừứửữựûüůū', 'UÙÚỦŨỤƯỪỨỬỮỰÛÜŮŪ',
-        'yýỳỷỹỵÿ', 'YÝỲỶỸỴŸ', 'zžżź', 'ZŽŻŹ'
-      ] : [
-        'aàáảãạăằắẳẵặâầấẩẫậäåāąAÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÄÅĀĄ', 'cçćčCÇĆČ',
-        'dđďDĐĎ', 'eèéẻẽẹêềếểễệëěēęEÈÉẺẼẸÊỀẾỂỄỆËĚĒĘ',
-        'iìíỉĩịîïīIÌÍỈĨỊÎÏĪ', 'lłLŁ', 'nñňńNÑŇŃ',
-        'oòóỏõọôồốổỗộơởỡớờợöøōOÒÓỎÕỌÔỒỐỔỖỘƠỞỠỚỜỢÖØŌ', 'rřRŘ',
-        'sšśșşSŠŚȘŞ', 'tťțţTŤȚŢ',
-        'uùúủũụưừứửữựûüůūUÙÚỦŨỤƯỪỨỬỮỰÛÜŮŪ', 'yýỳỷỹỵÿYÝỲỶỸỴŸ', 'zžżźZŽŻŹ'
-      ];
+      dct = this.opt.diacritics;
     let handled = [];
+    // to be done....
     str.split('').forEach(ch => {
       dct.every(dct => {
         // Check if the character is inside a diacritics list
