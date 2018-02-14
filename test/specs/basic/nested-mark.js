@@ -9,7 +9,6 @@ describe(
       $ctx = $('.basic-nested-mark');
       instance = new Mark($ctx[0]);
       instance.mark('lorem test ipsum', {
-        'diacritics': false,
         'separateWordSearch': false,
         'className': 'root',
         'done': function() {

@@ -12,7 +12,6 @@ describe('mark with iframes where onload was not fired yet', function() {
     errCall = 0;
     try {
       new Mark($ctx[0]).mark('test', {
-        'diacritics': false,
         'separateWordSearch': false,
         'iframes': true,
         'each': function($m) {

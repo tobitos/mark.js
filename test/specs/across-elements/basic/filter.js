@@ -17,7 +17,6 @@ describe('mark with acrossElements and filter callback', function() {
       calls = 0;
     try {
       new Mark($ctx[0]).mark(Object.keys(counter), {
-        'diacritics': false,
         'separateWordSearch': false,
         'acrossElements': true,
         'filter': function(node, term, totalMatches, matches) {

@@ -17,7 +17,6 @@ describe('basic mark with filter callback', function() {
       calls = 0;
     try {
       new Mark($ctx[0]).mark(Object.keys(counter), {
-        'diacritics': false,
         'separateWordSearch': false,
         'filter': function(node, term, totalMatches, matches) {
           expect(node.nodeType).toBe(3);

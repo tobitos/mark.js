@@ -9,7 +9,6 @@ describe('mark with disabled iframes', function() {
     errCall = 0;
     try {
       new Mark($ctx[0]).mark('lorem', {
-        'diacritics': false,
         'separateWordSearch': false,
         'iframes': false,
         'each': function($m) {

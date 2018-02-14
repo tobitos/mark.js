@@ -25,7 +25,6 @@ describe('basic mark in large documents', function() {
     start = new Date();
     try {
       new Mark($ctx[0]).mark('lorem', {
-        'diacritics': false,
         'separateWordSearch': false,
         'done': function() {
           end = new Date();

@@ -9,7 +9,6 @@ describe('mark with acrossElements and matches across iframes', function() {
     errCall = 0;
     try {
       new Mark($ctx[0]).mark(['dolor sit', 'amet. Lorem'], {
-        'diacritics': false,
         'separateWordSearch': false,
         'iframes': true,
         'acrossElements': true,

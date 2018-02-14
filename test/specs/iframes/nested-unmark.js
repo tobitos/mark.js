@@ -10,7 +10,6 @@ describe('unmark with nested iframes', function() {
     try {
       var instance = new Mark($ctx[0]);
       instance.mark('lorem', {
-        'diacritics': false,
         'separateWordSearch': false,
         'iframes': true,
         'each': function($el) {

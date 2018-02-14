@@ -8,7 +8,6 @@ describe(
 
       $ctx = $('.basic-script-style');
       new Mark($ctx[0]).mark('lorem', {
-        'diacritics': false,
         'separateWordSearch': false,
         'done': done
       });
