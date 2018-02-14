@@ -8,7 +8,6 @@ describe('mark with acrossElements in an empty context', function() {
     $ctx1 = $('.notExistingSelector');
     $ctx2 = $('.across-elements-empty');
     new Mark($ctx1[0]).mark('lorem', {
-      'diacritics': false,
       'separateWordSearch': false,
       'acrossElements': true,
       'done': function() {

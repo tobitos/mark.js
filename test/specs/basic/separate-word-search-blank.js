@@ -8,15 +8,12 @@ describe('basic mark with separateWordSearch and blanks', function() {
     $ctx2 = $('.basic-separate-blank > div:nth-child(2)');
     $ctx3 = $('.basic-separate-blank > div:nth-child(3)');
     new Mark($ctx1[0]).mark('lorem ', {
-      'diacritics': false,
       'separateWordSearch': true,
       'done': function() {
         new Mark($ctx2[0]).mark(' lorem ', {
-          'diacritics': false,
           'separateWordSearch': true,
           'done': function() {
             new Mark($ctx3[0]).mark([''], {
-              'diacritics': false,
               'separateWordSearch': true,
               'done': function() {
                 done();

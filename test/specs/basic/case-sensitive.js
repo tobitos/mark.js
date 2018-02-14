@@ -10,7 +10,6 @@ describe('basic mark with caseSenstive', function() {
       'caseSensitive': true,
       'done': function() {
         new Mark($ctx2[0]).mark(['lorem'], {
-          'diacritics': true,
           'separateWordSearch': false,
           'caseSensitive': false,
           'synonyms' : {

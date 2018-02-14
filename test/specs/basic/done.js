@@ -7,7 +7,6 @@ describe('basic mark with done callback', function() {
     totalMatches = doneCalled = 0;
     $ctx = $('.basic');
     new Mark($ctx[0]).mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'done': function(counter) {
         doneCalled++;

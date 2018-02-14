@@ -17,7 +17,6 @@ describe('mark with iframes where onload was already fired', function() {
         if (readyState === 'complete' && href !== 'about:blank') {
           clearInterval(int);
           new Mark($ctx[0]).mark('lorem', {
-            'diacritics': false,
             'separateWordSearch': false,
             'iframes': true,
             'each': function($m) {

@@ -7,7 +7,6 @@ describe('basic unmark', function() {
     $ctx = $('.basic');
     var instance = new Mark($ctx[0]);
     instance.mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'done': function() {
         ret = instance.unmark({

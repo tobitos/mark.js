@@ -7,7 +7,6 @@ describe('mark with acrossElements and multiple blanks', function() {
     $ctx1 = $('.across-elements-merge-blanks > div:nth-child(1)');
     $ctx2 = $('.across-elements-merge-blanks > div:nth-child(2)');
     new Mark($ctx1.get()).mark('lorem  ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'acrossElements': true,
       'done': function() {

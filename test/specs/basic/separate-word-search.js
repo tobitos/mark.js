@@ -8,7 +8,6 @@ describe('basic mark with separateWordsearch', function() {
     $ctx2 = $('.basic-separate > div:last-child');
     notFound = [];
     new Mark($ctx1[0]).mark('lorem ipsum test', {
-      'diacritics': false,
       'separateWordSearch': true,
       'noMatch': function(term) {
         notFound.push(term);

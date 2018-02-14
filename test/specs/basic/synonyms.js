@@ -11,7 +11,6 @@ describe('basic mark with synonyms', function() {
         'lorem': 'ipsum'
       },
       'separateWordSearch': false,
-      'diacritics': false,
       'done': function() {
         new Mark($ctx2[0]).mark(['one', '2', 'lüfte'], {
           'separateWordSearch': false,

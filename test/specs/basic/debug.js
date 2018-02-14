@@ -7,7 +7,6 @@ describe('basic mark with debug callback', function() {
     debugCalled = 0;
     $ctx = $('.basic');
     new Mark($ctx[0]).mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'debug': true,
       'log': {

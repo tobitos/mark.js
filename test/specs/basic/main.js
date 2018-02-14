@@ -6,7 +6,6 @@ describe('basic mark', function() {
 
     $ctx = $('.basic');
     ret = new Mark($ctx[0]).mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'done': function() {
         // otherwise "ret =" will not be executed

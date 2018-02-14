@@ -11,7 +11,6 @@ describe('basic mark with synonyms and noMatch', function() {
         'test': 'ipsum'
       },
       'separateWordSearch': false,
-      'diacritics': false,
       'noMatch': function(term) {
         notFound.push(term);
       },

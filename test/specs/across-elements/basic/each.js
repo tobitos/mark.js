@@ -7,7 +7,6 @@ describe('mark with acrossElements and each callback', function() {
     eachCalled = 0;
     $ctx = $('.across-elements');
     new Mark($ctx[0]).mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'acrossElements': true,
       'each': function() {

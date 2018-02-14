@@ -6,7 +6,6 @@ describe('basic unmark with jquery', function() {
 
     $ctx = $('.basic');
     $ctx.mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'done': function() {
         ret = $ctx.unmark({

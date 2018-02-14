@@ -6,7 +6,6 @@ describe('basic mark called with an array of contexts', function() {
 
     $ctx = $('.basic-context-array');
     new Mark($ctx.get()).mark('lorem', {
-      'diacritics': false,
       'separateWordSearch': false,
       'done': done
     });

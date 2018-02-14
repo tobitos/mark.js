@@ -8,7 +8,6 @@ describe('basic mark in an empty context', function() {
     $ctx1 = $('.notExistingSelector');
     $ctx2 = $('.basic-empty');
     new Mark($ctx1[0]).mark('lorem', {
-      'diacritics': false,
       'separateWordSearch': false,
       'done': function() {
         done1 = true;

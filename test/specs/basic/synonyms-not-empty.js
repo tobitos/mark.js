@@ -9,7 +9,6 @@ describe('basic mark ignore empty synonyms', function() {
         'lorem': ''
       },
       'separateWordSearch': false,
-      'diacritics': false,
       'done': done
     });
   });

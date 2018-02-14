@@ -9,7 +9,6 @@ describe('basic mark with escaped wildcards', function() {
     $ctx3 = $('.basic-wildcards > div:nth-child(3)');
     new Mark($ctx1[0]).mark('lor\\?m', {
       'separateWordSearch': false,
-      'diacritics': false,
       'wildcards': 'enabled',
       'done': function() {
         new Mark($ctx2[0]).mark('lor\\*m', {
@@ -22,7 +21,6 @@ describe('basic mark with escaped wildcards', function() {
               'Lor\\*m'
             ], {
               'separateWordSearch': false,
-              'diacritics': false,
               'wildcards': 'enabled',
               'done': done
             });

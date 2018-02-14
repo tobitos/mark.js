@@ -11,12 +11,10 @@ describe('basic mark with caseSensitive synonyms', function() {
         'Lorem': 'ipsum'
       },
       'separateWordSearch': false,
-      'diacritics': false,
       'caseSensitive': true,
       'done': function() {
         new Mark($ctx2[0]).mark(['one', '2', 'lüfte'], {
           'separateWordSearch': false,
-          'diacritics': false,
           'caseSensitive': true,
           'synonyms': {
             'ü': 'ue',

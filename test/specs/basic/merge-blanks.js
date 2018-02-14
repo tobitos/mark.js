@@ -7,7 +7,6 @@ describe('basic mark with multiple blanks', function() {
     $ctx1 = $('.basic-merge-blanks > div:nth-child(1)');
     $ctx2 = $('.basic-merge-blanks > div:nth-child(2)');
     new Mark($ctx1.get()).mark('lorem  ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'done': function() {
         new Mark($ctx2.get()).mark('lorem ipsum', {

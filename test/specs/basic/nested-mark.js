@@ -13,7 +13,6 @@ describe(
         'className': 'root',
         'done': function() {
           instance.mark('test', {
-            'diacritics': false,
             'separateWordSearch': false,
             'className': 'nested',
             'done': done

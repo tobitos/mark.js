@@ -7,7 +7,6 @@ describe('basic mark with synonyms and multiple blanks', function() {
     $ctx = $('.basic-synonyms-merge-blanks');
     new Mark($ctx[0]).mark(['dolor', 'amet'], {
       'separateWordSearch': false,
-      'diacritics': false,
       'synonyms': {
         'dolor': 'lorem  ipsum'
       },

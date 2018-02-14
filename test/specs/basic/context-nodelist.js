@@ -7,7 +7,6 @@ describe('basic mark called with a NodeList context', function() {
     $ctx = $('.basic-context-nodelist');
     var ctxNodelist = document.querySelectorAll('.basic-context-nodelist');
     new Mark(ctxNodelist).mark('lorem', {
-      'diacritics': false,
       'separateWordSearch': false,
       'done': done
     });

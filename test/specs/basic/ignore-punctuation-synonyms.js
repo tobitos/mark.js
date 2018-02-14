@@ -14,7 +14,6 @@ describe('basic mark with ignorePunctuation and synonyms', function() {
     $ctx2 = $('.basic-ignore-punctuation-synonyms > div:nth-child(2)');
     new Mark($ctx1[0]).mark('Lorem', {
       'separateWordSearch': false,
-      'diacritics': false,
       'ignorePunctuation': punctuation,
       'synonyms': {
         'Lorem': 'ipsum'

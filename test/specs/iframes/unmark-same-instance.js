@@ -10,7 +10,6 @@ describe('iframes unmark and mark with the same instance', function() {
     instance.unmark({
       'done': function() {
         instance.mark('lorem ipsum', {
-          'diacritics': false,
           'iframes': true,
           'separateWordSearch': false,
           'each': function(node) {

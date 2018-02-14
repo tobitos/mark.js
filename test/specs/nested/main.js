@@ -6,7 +6,6 @@ describe('nested mark', function() {
 
     $ctx = $('.nested');
     new Mark($ctx[0]).mark('lorem', {
-      'diacritics': false,
       'separateWordSearch': false,
       'className': 'mark',
       'done': done

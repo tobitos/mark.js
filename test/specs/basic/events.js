@@ -11,7 +11,6 @@ describe('unmark with click event', function() {
     });
     var instance = new Mark($ctx[0]);
     instance.mark('test', {
-      'diacritics': false,
       'separateWordSearch': false,
       'done': function() {
         instance.unmark({

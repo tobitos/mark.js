@@ -6,7 +6,6 @@ describe('basic mark called with jquery', function() {
 
     $ctx = $('.basic');
     ret = $ctx.mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'done': function() {
         // otherwise "ret =" will not be executed

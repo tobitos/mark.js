@@ -8,7 +8,6 @@ describe('basic mark with regex characters', function() {
     new Mark($ctx[0]).mark([
       '39,00 €', '0.009 €', 'Unk?nown', 'Some+>thing', 'www.happy.com\\'
     ], {
-      'diacritics': false,
       'separateWordSearch': false,
       'done': function() {
         done();

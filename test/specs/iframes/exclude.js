@@ -7,7 +7,6 @@ describe('mark with iframes and exclude', function() {
     $elements = $();
     $ctx = $('.iframes-exclude');
     new Mark($ctx[0]).mark('lorem', {
-      'diacritics': false,
       'separateWordSearch': false,
       'iframes': true,
       'exclude': [

@@ -7,7 +7,6 @@ describe('nested unmark', function() {
     $ctx = $('.nested');
     var instance = new Mark($ctx[0]);
     instance.mark('lorem', {
-      'diacritics': false,
       'separateWordSearch': false,
       'className': 'mark',
       'done': function() {

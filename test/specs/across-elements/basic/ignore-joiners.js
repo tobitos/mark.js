@@ -6,7 +6,6 @@ describe('mark with acrossElements and ignoreJoiners', function() {
 
     $ctx = $('.across-elements-ignore-joiners');
     new Mark($ctx[0]).mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'acrossElements': true,
       'ignoreJoiners': true,

@@ -7,7 +7,6 @@ describe('basic mark with custom element and class', function() {
     $ctx1 = $('.basic-custom-element-class > div:first-child');
     $ctx2 = $('.basic-custom-element-class > div:last-child');
     new Mark($ctx1[0]).mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'element': 'i',
       'done': function() {

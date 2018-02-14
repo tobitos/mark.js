@@ -15,7 +15,6 @@ describe('basic mark with ignorePunctuation and accuracy', function() {
     $ctx2 = $('.basic-ignore-punctuation-accuracy > div:nth-child(2)');
     new Mark($ctx1[0]).mark('rem ips', {
       'separateWordSearch': false,
-      'diacritics': false,
       'accuracy': {
         'value': 'complementary',
         // remove certain limiters for the given HTML

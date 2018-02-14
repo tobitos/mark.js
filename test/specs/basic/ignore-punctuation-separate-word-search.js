@@ -17,7 +17,6 @@ describe(
       $ctx2 = $container.children('div:nth-child(2)');
       new Mark($ctx1[0]).mark('Lorem ipsum', {
         'separateWordSearch': true,
-        'diacritics': false,
         'ignorePunctuation': punctuation,
         'done': function() {
           new Mark($ctx2[0]).mark(['amet ipsum'], {

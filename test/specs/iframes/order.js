@@ -7,7 +7,6 @@ describe('mark with iframes DOM order', function() {
     $ctx = $('.iframes-order');
     elements = [];
     new Mark($ctx[0]).mark('lorem', {
-      'diacritics': false,
       'separateWordSearch': false,
       'iframes': true,
       'each': function(node) {

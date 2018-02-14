@@ -7,7 +7,6 @@ describe('basic mark with noMatch callback', function() {
     notFound = [];
     $ctx = $('.basic');
     new Mark($ctx[0]).mark('test', {
-      'diacritics': false,
       'separateWordSearch': false,
       'noMatch': function(term) {
         notFound.push(term);

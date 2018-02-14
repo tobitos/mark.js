@@ -7,7 +7,6 @@ describe('unmark with elements inside marked elements', function() {
     $ctx = $('.basic-manipulated-mark');
     var instance = new Mark($ctx[0]);
     instance.mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'done': function() {
         $('<span />', {

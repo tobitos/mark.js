@@ -11,7 +11,6 @@ describe('basic mark with wildcards and synonyms', function() {
         'Lor?m': 'Ips?m'
       },
       'separateWordSearch': false,
-      'diacritics': true,
       'ignoreJoiners': true,
       'wildcards': 'enabled',
       'done': function() {

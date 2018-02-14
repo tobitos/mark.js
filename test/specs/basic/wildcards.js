@@ -10,7 +10,6 @@ describe('basic mark with wildcards', function() {
     $ctx4 = $('.basic-wildcards > div:nth-child(4)');
     new Mark($ctx1[0]).mark('lor?m', {
       'separateWordSearch': false,
-      'diacritics': false,
       'wildcards': 'enabled',
       'done': function() {
         new Mark($ctx2[0]).mark('lor*m', {
@@ -20,7 +19,6 @@ describe('basic mark with wildcards', function() {
           'done': function() {
             new Mark($ctx3[0]).mark(['lor?m', 'Lor*m'], {
               'separateWordSearch': false,
-              'diacritics': false,
               'wildcards': 'enabled',
               'done': function() {
                 new Mark($ctx4[0]).mark(['lor?m', 'Lor*m'], {

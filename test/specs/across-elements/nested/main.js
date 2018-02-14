@@ -6,7 +6,6 @@ describe('mark with acrossElements and nested matches', function() {
 
     $ctx = $('.across-elements-nested');
     new Mark($ctx[0]).mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'acrossElements': true,
       'done': done

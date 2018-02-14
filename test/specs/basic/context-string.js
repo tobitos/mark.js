@@ -6,7 +6,6 @@ describe('basic mark called with a string selector as context', function() {
 
     $ctx = $('.basic-context-string');
     new Mark('.basic-context-string').mark('lorem', {
-      'diacritics': false,
       'separateWordSearch': false,
       'done': done
     });

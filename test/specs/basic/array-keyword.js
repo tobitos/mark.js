@@ -7,7 +7,6 @@ describe('basic mark with an array of keywords', function() {
     $ctx = $('.basic-array-keyword');
     notFound = [];
     new Mark($ctx[0]).mark(['lorem', 'ipsum', 'test', 'hey'], {
-      'diacritics': false,
       'separateWordSearch': false,
       'noMatch': function(term) {
         notFound.push(term);

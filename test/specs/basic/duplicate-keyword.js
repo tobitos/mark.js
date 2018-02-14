@@ -8,7 +8,6 @@ describe('basic mark with duplicated keywords', function() {
     $ctx2 = $('.basic-duplicate-keywords > div:last-child');
     ctx1Called = ctx2Called = 0;
     new Mark($ctx1[0]).mark(['test', 'test'], {
-      'diacritics': false,
       'separateWordSearch': false,
       'filter': function(){
         ctx1Called++;
