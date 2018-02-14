@@ -21,7 +21,6 @@ describe(
         'done': function() {
           new Mark($ctx2[0]).mark(['amet ipsum'], {
             'separateWordSearch': true,
-            'diacritics': false,
             'ignorePunctuation': punctuation,
             'done': done
           });

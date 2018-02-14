@@ -20,7 +20,6 @@ describe('basic mark with ignorePunctuation', function() {
       'done': function() {
         new Mark($ctx2[0]).mark(['Lorem ipsum'], {
           'separateWordSearch': false,
-          'diacritics': false,
           'ignorePunctuation': punctuation,
           'done': function() {
             new Mark($ctx3[0]).mark(['ipsum'], {

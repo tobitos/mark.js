@@ -11,7 +11,6 @@ describe('mark with acrossElements and multiple blanks', function() {
       'acrossElements': true,
       'done': function() {
         new Mark($ctx2.get()).mark('lorem ipsum', {
-          'diacritics': false,
           'separateWordSearch': false,
           'acrossElements': true,
           'done': done

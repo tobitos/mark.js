@@ -11,7 +11,6 @@ describe('basic mark with custom element and class', function() {
       'element': 'i',
       'done': function() {
         new Mark($ctx2[0]).mark('lorem ipsum', {
-          'diacritics': false,
           'separateWordSearch': false,
           'element': 'i',
           'className': 'custom',

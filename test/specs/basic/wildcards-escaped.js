@@ -13,7 +13,6 @@ describe('basic mark with escaped wildcards', function() {
       'done': function() {
         new Mark($ctx2[0]).mark('lor\\*m', {
           'separateWordSearch': false,
-          'diacritics': false,
           'wildcards': 'enabled',
           'done': function() {
             new Mark($ctx3[0]).mark([

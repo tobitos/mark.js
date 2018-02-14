@@ -14,7 +14,6 @@ describe('basic mark with separateWordsearch', function() {
       },
       'done': function() {
         new Mark($ctx2[0]).mark(['lorem ipsum'], {
-          'diacritics': false,
           'separateWordSearch': true,
           'done': done
         });

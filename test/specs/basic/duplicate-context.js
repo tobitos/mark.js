@@ -8,7 +8,6 @@ describe('basic mark with duplicated contexts', function() {
     $ctx2 = $('.basic-duplicate-context > div:last-child');
     ctx1Called = ctx2Called = 0;
     new Mark([$ctx1[0], $ctx1[0]]).mark('test', {
-      'diacritics': false,
       'separateWordSearch': false,
       'filter': function(){
         ctx1Called++;

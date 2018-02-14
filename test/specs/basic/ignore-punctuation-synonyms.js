@@ -21,7 +21,6 @@ describe('basic mark with ignorePunctuation and synonyms', function() {
       'done': function() {
         new Mark($ctx2[0]).mark(['one', 'dos', 'lüfte'], {
           'separateWordSearch': false,
-          'diacritics': false,
           'ignorePunctuation': punctuation,
           'synonyms': {
             'ü': 'ue',

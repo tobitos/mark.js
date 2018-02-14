@@ -15,7 +15,6 @@ describe('basic mark with ignoreJoiners and synonyms', function() {
       'done': function() {
         new Mark($ctx2[0]).mark(['one', 'dos', 'lüfte'], {
           'separateWordSearch': false,
-          'diacritics': false,
           'ignoreJoiners': true,
           'synonyms': {
             'ü': 'ue',

@@ -10,7 +10,6 @@ describe('basic mark with multiple blanks', function() {
       'separateWordSearch': false,
       'done': function() {
         new Mark($ctx2.get()).mark('lorem ipsum', {
-          'diacritics': false,
           'separateWordSearch': false,
           'done': done
         });

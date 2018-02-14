@@ -7,7 +7,6 @@ describe('basic unmark with custom element and class', function() {
     $ctx = $('.basic-custom-element-class > div:first-child');
     var instance = new Mark($ctx[0]);
     instance.mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'element': 'i',
       'className': 'custom',

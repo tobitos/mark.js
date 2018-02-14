@@ -6,7 +6,6 @@ describe('basic mark with exclude', function() {
 
     $ctx = $('.basic-exclude');
     new Mark($ctx[0]).mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'exclude': [
         '*[data-ignore]',

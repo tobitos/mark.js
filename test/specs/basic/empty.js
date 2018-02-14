@@ -12,7 +12,6 @@ describe('basic mark in an empty context', function() {
       'done': function() {
         done1 = true;
         new Mark($ctx2[0]).mark('lorem', {
-          'diacritics': false,
           'separateWordSearch': false,
           'done': function() {
             done2 = true;

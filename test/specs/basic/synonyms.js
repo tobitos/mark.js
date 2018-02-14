@@ -14,7 +14,6 @@ describe('basic mark with synonyms', function() {
       'done': function() {
         new Mark($ctx2[0]).mark(['one', '2', 'lüfte'], {
           'separateWordSearch': false,
-          'diacritics': false,
           'synonyms': {
             'ü': 'ue',
             'one': '1',

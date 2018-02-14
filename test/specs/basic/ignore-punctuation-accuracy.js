@@ -24,7 +24,6 @@ describe('basic mark with ignorePunctuation and accuracy', function() {
       'done': function() {
         new Mark($ctx2[0]).mark(['ipsum'], {
           'separateWordSearch': false,
-          'diacritics': false,
           'accuracy': 'exact',
           'ignorePunctuation': punctuation,
           'done': done

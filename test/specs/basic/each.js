@@ -7,7 +7,6 @@ describe('basic mark with each callback', function() {
     eachCalled = 0;
     $ctx = $('.basic');
     new Mark($ctx[0]).mark('lorem ipsum', {
-      'diacritics': false,
       'separateWordSearch': false,
       'each': function() {
         eachCalled++;
