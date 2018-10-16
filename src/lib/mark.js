@@ -1,5 +1,11 @@
-import DOMIterator from './domiterator';
-import RegExpCreator from './regexpcreator';
+import DOMIterator from "./domiterator";
+import RegExpCreator from "./regexpcreator";
+
+const setAttributes = (el, attrs) => {
+  for (var key in attrs) {
+    el.setAttribute(key, attrs[key]);
+  }
+};
 
 /**
  * Marks search terms in DOM elements
@@ -11,7 +17,6 @@ import RegExpCreator from './regexpcreator';
  * new Mark('.context').markRanges([{start:10,length:0}]);
  */
 class Mark {
-
   /**
    * @param {HTMLElement|HTMLElement[]|NodeList|string} ctx - The context DOM
    * element, an array of DOM elements, a NodeList or a selector
@@ -26,13 +31,13 @@ class Mark {
     this.ctx = ctx;
     /**
      * Specifies if the current browser is a IE (necessary for the node
-     * normalization bug workaround). See {@link Mark#unwrapMatches}
+     * normalization bug workaround). See {@link Mark#unhighlightMatches}
      * @type {boolean}
      * @access protected
      */
     this.ie = false;
     const ua = window.navigator.userAgent;
-    if (ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1) {
+    if (ua.indexOf("MSIE") > -1 || ua.indexOf("Trident") > -1) {
       this.ie = true;
     }
   }
@@ -46,22 +51,26 @@ class Mark {
    * @access protected
    */
   set opt(val) {
-    this._opt = Object.assign({}, {
-      'element': '',
-      'className': '',
-      'exclude': [],
-      'iframes': false,
-      'iframesTimeout': 5000,
-      'separateWordSearch': true,
-      'acrossElements': false,
-      'ignoreGroups': 0,
-      'each': () => {},
-      'noMatch': () => {},
-      'filter': () => true,
-      'done': () => {},
-      'debug': false,
-      'log': window.console
-    }, val);
+    this._opt = Object.assign(
+      {},
+      {
+        element: "",
+        className: "",
+        exclude: [],
+        iframes: false,
+        iframesTimeout: 5000,
+        separateWordSearch: true,
+        acrossElements: false,
+        ignoreGroups: 0,
+        each: () => {},
+        noMatch: () => {},
+        filter: () => true,
+        done: () => {},
+        debug: false,
+        log: window.console
+      },
+      val
+    );
   }
 
   get opt() {
@@ -90,12 +99,12 @@ class Mark {
    * <code>error</code>, <code>debug</code>
    * @access protected
    */
-  log(msg, level = 'debug') {
+  log(msg, level = "debug") {
     const log = this.opt.log;
     if (!this.opt.debug) {
       return;
     }
-    if (typeof log === 'object' && typeof log[level] === 'function') {
+    if (typeof log === "object" && typeof log[level] === "function") {
       log[level](`mark.js: ${msg}`);
     }
   }
@@ -121,7 +130,7 @@ class Mark {
           stack.push(kw);
         }
       } else {
-        kw.split(' ').forEach(kwSplitted => {
+        kw.split(" ").forEach(kwSplitted => {
           if (kwSplitted.trim() && stack.indexOf(kwSplitted) === -1) {
             stack.push(kwSplitted);
           }
@@ -130,10 +139,10 @@ class Mark {
     });
     return {
       // sort because of https://git.io/v6USg
-      'keywords': stack.sort((a, b) => {
+      keywords: stack.sort((a, b) => {
         return b.length - a.length;
       }),
-      'length': stack.length
+      length: stack.length
     };
   }
 
@@ -178,21 +187,21 @@ class Mark {
     // quick validity check of the first entry only
     if (
       !Array.isArray(array) ||
-      Object.prototype.toString.call(array[0]) !== '[object Object]'
+      Object.prototype.toString.call(array[0]) !== "[object Object]"
     ) {
-      this.log('markRanges() will only accept an array of objects');
+      this.log("markRanges() will only accept an array of objects");
       this.opt.noMatch(array);
       return [];
     }
     const stack = [];
     let last = 0;
     array
-    // ensure there is no overlap in start & end offsets
+      // ensure there is no overlap in start & end offsets
       .sort((a, b) => {
         return a.start - b.start;
       })
       .forEach(item => {
-        let {start, end, valid} = this.callNoMatchOnInvalidRanges(item, last);
+        let { start, end, valid } = this.callNoMatchOnInvalidRanges(item, last);
         if (valid) {
           // preserve item in case there are extra key:values within
           item.start = start;
@@ -223,9 +232,12 @@ class Mark {
    * @access protected
    */
   callNoMatchOnInvalidRanges(range, last) {
-    let start, end,
-      valid = false;
-    if (range && typeof range.start !== 'undefined') {
+    let start;
+
+    let end;
+
+    let valid = false;
+    if (range && typeof range.start !== "undefined") {
       start = parseInt(range.start, 10);
       end = start + parseInt(range.length, 10);
       // ignore overlapping values & non-numeric entries
@@ -238,8 +250,7 @@ class Mark {
         valid = true;
       } else {
         this.log(
-          'Ignoring invalid or overlapping range: ' +
-          `${JSON.stringify(range)}`
+          "Ignoring invalid or overlapping range: " + `${JSON.stringify(range)}`
         );
         this.opt.noMatch(range);
       }
@@ -266,13 +277,19 @@ class Mark {
    * @access protected
    */
   checkWhitespaceRanges(range, originalLength, string) {
-    let end,
-      valid = true,
-      // the max value changes after the DOM is manipulated
-      max = string.length,
-      // adjust offset to account for wrapped text node
-      offset = originalLength - max,
-      start = parseInt(range.start, 10) - offset;
+    let end;
+
+    let valid = true;
+
+    // the max value changes after the DOM is manipulated
+
+    let max = string.length;
+
+    // adjust offset to account for highlighted text node
+
+    let offset = originalLength - max;
+
+    let start = parseInt(range.start, 10) - offset;
     // make sure to stop at max
     start = start > max ? max : start;
     end = start + parseInt(range.length, 10);
@@ -284,10 +301,10 @@ class Mark {
       valid = false;
       this.log(`Invalid range: ${JSON.stringify(range)}`);
       this.opt.noMatch(range);
-    } else if (string.substring(start, end).replace(/\s+/g, '') === '') {
+    } else if (string.substring(start, end).replace(/\s+/g, "") === "") {
       valid = false;
-      // whitespace only; even if wrapped it is not visible
-      this.log('Skipping whitespace only range: ' + JSON.stringify(range));
+      // whitespace only; even if highlighted it is not visible
+      this.log("Skipping whitespace only range: " + JSON.stringify(range));
       this.opt.noMatch(range);
     }
     return {
@@ -322,26 +339,32 @@ class Mark {
    * @access protected
    */
   getTextNodes(cb) {
-    let val = '',
-      nodes = [];
-    this.iterator.forEachNode(NodeFilter.SHOW_TEXT, node => {
-      nodes.push({
-        start: val.length,
-        end: (val += node.textContent).length,
-        node
-      });
-    }, node => {
-      if (this.matchesExclude(node.parentNode)) {
-        return NodeFilter.FILTER_REJECT;
-      } else {
-        return NodeFilter.FILTER_ACCEPT;
+    let val = "";
+
+    let nodes = [];
+    this.iterator.forEachNode(
+      NodeFilter.SHOW_TEXT,
+      node => {
+        nodes.push({
+          start: val.length,
+          end: (val += node.textContent).length,
+          node
+        });
+      },
+      node => {
+        if (this.matchesExclude(node.parentNode)) {
+          return NodeFilter.FILTER_REJECT;
+        } else {
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      },
+      () => {
+        cb({
+          value: val,
+          nodes: nodes
+        });
       }
-    }, () => {
-      cb({
-        value: val,
-        nodes: nodes
-      });
-    });
+    );
   }
 
   /**
@@ -353,38 +376,112 @@ class Mark {
    * @access protected
    */
   matchesExclude(el) {
-    return DOMIterator.matches(el, this.opt.exclude.concat([
-      // ignores the elements itself, not their childrens (selector *)
-      'script', 'style', 'title', 'head', 'html'
-    ]));
+    return DOMIterator.matches(
+      el,
+      this.opt.exclude.concat([
+        // ignores the elements itself, not their childrens (selector *)
+        "script",
+        "style",
+        "title",
+        "head",
+        "html"
+      ])
+    );
   }
 
   /**
    * Wraps the instance element and class around matches that fit the start and
    * end positions within the node
    * @param  {HTMLElement} node - The DOM text node
-   * @param  {number} start - The position where to start wrapping
-   * @param  {number} end - The position where to end wrapping
-   * @return {HTMLElement} Returns the splitted text node that will appear
+   * @param  {number} start - The position where to start highlighting
+   * @param  {number} end - The position where to end highlighting
+   * @return {HTMLElement} Returns the split text node that will appear
    * after the wrapped text node
    * @access protected
    */
-  wrapRangeInTextNode(node, start, end) {
-    const hEl = !this.opt.element ? 'mark' : this.opt.element,
-      startNode = node.splitText(start),
-      ret = startNode.splitText(end - start);
+  wrapInHtmlTag(node, start, end) {
+    const hEl = !this.opt.element ? "mark" : this.opt.element;
+
+    const startNode = node.splitText(start);
+
+    const ret = startNode.splitText(end - start);
     let repl = document.createElement(hEl);
-    repl.setAttribute('data-markjs', 'true');
+    repl.setAttribute("data-markjs", "true");
     if (this.opt.className) {
-      repl.setAttribute('class', this.opt.className);
+      repl.setAttribute("class", this.opt.className);
     }
     repl.textContent = startNode.textContent;
     startNode.parentNode.replaceChild(repl, startNode);
+
     return ret;
   }
 
   /**
-   * @typedef Mark~wrapRangeInMappedTextNodeDict
+   * Highlights the matches that fit the start and
+   * end positions within the node by adding an svg rectangle
+   * behind the text
+   * @param  {HTMLElement} node - The DOM text node
+   * @param  {number} start - The position where to start highlighting
+   * @param  {number} end - The position where to end highlighting
+   * @return {HTMLElement} Returns the split text node that will appear
+   * after the highlighted text node
+   * @access protected
+   */
+  addSvgRectangle(node, start, end) {
+    const tspan = node.parentNode;
+    const text = node.parentNode.parentNode;
+    const g = node.parentNode.parentNode.parentNode;
+
+    const startNode = node.splitText(start);
+    const ret = startNode.splitText(end - start);
+    console.log("node", node, "startNode", startNode, "ret", ret);
+
+    let rectangle = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "rect"
+    );
+
+    const letterPositions = tspan.getAttribute("x").split(" ");
+
+    const doesWordReachEndOfBlock = end >= ret.length;
+
+    setAttributes(rectangle, {
+      x: `${letterPositions[start]}px`,
+      y: `${tspan.getAttribute("y") -
+        parseInt(tspan.getAttribute("font-size"))}`,
+      width: `${letterPositions[doesWordReachEndOfBlock ? end - 1 : end] -
+        letterPositions[start]}px`,
+      height: tspan.getAttribute("font-size"),
+      fill: "yellow",
+      transform: text.getAttribute("transform"),
+      "data-markjs": "true"
+    });
+
+    g.insertBefore(rectangle, text);
+
+    return ret;
+  }
+
+  /**
+   * Determines if we're in regular HTML or an svg and calls the right
+   * highlighting function accordingly
+   * @param  {HTMLElement} node - The DOM text node
+   * @param  {number} start - The position where to start highlighting
+   * @param  {number} end - The position where to end highlighting
+   * @return {HTMLElement} Returns the split text node that will appear
+   * after the highlighted text node
+   * @access protected
+   */
+  highlightRangeInTextNode(node, start, end) {
+    console.log("node.parentNode.nodeName", node.parentNode.nodeName);
+    const isSvg = node.parentNode.nodeName === "svg:tspan";
+    return isSvg
+      ? this.addSvgRectangle(node, start, end)
+      : this.wrapInHtmlTag(node, start, end);
+  }
+
+  /**
+   * @typedef Mark~highlightRangeInMappedTextNodeDict
    * @type {object.<string>}
    * @property {string} value - The composite value of all text nodes
    * @property {object[]} nodes - An array of objects
@@ -396,45 +493,48 @@ class Mark {
    */
   /**
    * Each callback
-   * @callback Mark~wrapMatchesEachCallback
-   * @param {HTMLElement} node - The wrapped DOM element
+   * @callback Mark~highlightMatchesEachCallback
+   * @param {HTMLElement} node - The highlighted DOM element
    * @param {number} lastIndex - The last matching position within the
    * composite value of text nodes
    */
 
   /**
    * Filter callback
-   * @callback Mark~wrapMatchesFilterCallback
+   * @callback Mark~highlightMatchesFilterCallback
    * @param {HTMLElement} node - The matching text node DOM element
    */
   /**
    * Determines matches by start and end positions using the text node
    * dictionary even across text nodes and calls
-   * {@link Mark#wrapRangeInTextNode} to wrap them
-   * @param  {Mark~wrapRangeInMappedTextNodeDict} dict - The dictionary
+   * {@link Mark#highlightRangeInTextNode} to highlight them
+   * @param  {Mark~highlightRangeInMappedTextNodeDict} dict - The dictionary
    * @param  {number} start - The start position of the match
    * @param  {number} end - The end position of the match
-   * @param  {Mark~wrapMatchesFilterCallback} filterCb - Filter callback
-   * @param  {Mark~wrapMatchesEachCallback} eachCb - Each callback
+   * @param  {Mark~highlightMatchesFilterCallback} filterCb - Filter callback
+   * @param  {Mark~highlightMatchesEachCallback} eachCb - Each callback
    * @access protected
    */
-  wrapRangeInMappedTextNode(dict, start, end, filterCb, eachCb) {
+  highlightRangeInMappedTextNode(dict, start, end, filterCb, eachCb) {
     // iterate over all text nodes to find the one matching the positions
     dict.nodes.every((n, i) => {
       const sibl = dict.nodes[i + 1];
-      if (typeof sibl === 'undefined' || sibl.start > start) {
+      if (typeof sibl === "undefined" || sibl.start > start) {
         if (!filterCb(n.node)) {
           return false;
         }
         // map range from dict.value to text node
-        const s = start - n.start,
-          e = (end > n.end ? n.end : end) - n.start,
-          startStr = dict.value.substr(0, n.start),
-          endStr = dict.value.substr(e + n.start);
-        n.node = this.wrapRangeInTextNode(n.node, s, e);
+        const s = start - n.start;
+
+        const e = (end > n.end ? n.end : end) - n.start;
+
+        const startStr = dict.value.substr(0, n.start);
+
+        const endStr = dict.value.substr(e + n.start);
+        n.node = this.highlightRangeInTextNode(n.node, s, e);
         // recalculate positions to also find subsequent matches in the
         // same text node. Necessary as the text node in dict now only
-        // contains the splitted part after the wrapped one
+        // contains the splitted part after the highlighted one
         dict.value = startStr + endStr;
         dict.nodes.forEach((k, j) => {
           if (j >= i) {
@@ -457,13 +557,13 @@ class Mark {
   }
 
   /**
-  * @param {HTMLElement} node - The text node where the match occurs
-  * @param {number} pos - The current position of the match within the node
-  * @param {number} len - The length of the current match within the node
-  * @param {Mark~wrapMatchesEachCallback} eachCb
-  */
-  wrapGroups(node, pos, len, eachCb) {
-    node = this.wrapRangeInTextNode(node, pos, pos + len);
+   * @param {HTMLElement} node - The text node where the match occurs
+   * @param {number} pos - The current position of the match within the node
+   * @param {number} len - The length of the current match within the node
+   * @param {Mark~highlightMatchesEachCallback} eachCb
+   */
+  highlightGroups(node, pos, len, eachCb) {
+    node = this.highlightRangeInTextNode(node, pos, pos + len);
     eachCb(node.previousSibling);
     return node;
   }
@@ -473,35 +573,35 @@ class Mark {
    * @param {HTMLElement} node - The text node where the match occurs
    * @param {array} match - The current match
    * @param {number} matchIdx - The start of the match based on ignoreGroups
-   * @param {Mark~wrapMatchesFilterCallback} filterCb
-   * @param {Mark~wrapMatchesEachCallback} eachCb
+   * @param {Mark~highlightMatchesFilterCallback} filterCb
+   * @param {Mark~highlightMatchesEachCallback} eachCb
    */
   separateGroups(node, match, matchIdx, filterCb, eachCb) {
     let matchLen = match.length;
     for (let i = 1; i < matchLen; i++) {
       let pos = node.textContent.indexOf(match[i]);
       if (match[i] && pos > -1 && filterCb(match[i], node)) {
-        node = this.wrapGroups(node, pos, match[i].length, eachCb);
+        node = this.highlightGroups(node, pos, match[i].length, eachCb);
       }
     }
     return node;
   }
 
   /**
-   * Filter callback before each wrapping
-   * @callback Mark~wrapMatchesFilterCallback
+   * Filter callback before each highlighting
+   * @callback Mark~highlightMatchesFilterCallback
    * @param {string} match - The matching string
    * @param {HTMLElement} node - The text node where the match occurs
    */
   /**
-   * Callback for each wrapped element
-   * @callback Mark~wrapMatchesEachCallback
+   * Callback for each highlighted element
+   * @callback Mark~highlightMatchesEachCallback
    * @param {HTMLElement} element - The marked DOM element
    */
 
   /**
    * Callback on end
-   * @callback Mark~wrapMatchesEndCallback
+   * @callback Mark~highlightMatchesEndCallback
    */
   /**
    * Wraps the instance element and class around matches within single HTML
@@ -509,12 +609,12 @@ class Mark {
    * @param {RegExp} regex - The regular expression to be searched for
    * @param {number} ignoreGroups - A number indicating the amount of RegExp
    * matching groups to ignore
-   * @param {Mark~wrapMatchesFilterCallback} filterCb
-   * @param {Mark~wrapMatchesEachCallback} eachCb
-   * @param {Mark~wrapMatchesEndCallback} endCb
+   * @param {Mark~highlightMatchesFilterCallback} filterCb
+   * @param {Mark~highlightMatchesEachCallback} eachCb
+   * @param {Mark~highlightMatchesEndCallback} endCb
    * @access protected
    */
-  wrapMatches(regex, ignoreGroups, filterCb, eachCb, endCb) {
+  highlightMatches(regex, ignoreGroups, filterCb, eachCb, endCb) {
     const matchIdx = ignoreGroups === 0 ? 0 : ignoreGroups + 1;
     this.getTextNodes(dict => {
       dict.nodes.forEach(node => {
@@ -522,16 +622,10 @@ class Mark {
         let match;
         while (
           (match = regex.exec(node.textContent)) !== null &&
-          match[matchIdx] !== ''
+          match[matchIdx] !== ""
         ) {
           if (this.opt.separateGroups) {
-            node = this.separateGroups(
-              node,
-              match,
-              matchIdx,
-              filterCb,
-              eachCb
-            );
+            node = this.separateGroups(node, match, matchIdx, filterCb, eachCb);
           } else {
             if (!filterCb(match[matchIdx], node)) {
               continue;
@@ -542,7 +636,12 @@ class Mark {
                 pos += match[i].length;
               }
             }
-            node = this.wrapGroups(node, pos, match[matchIdx].length, eachCb);
+            node = this.highlightGroups(
+              node,
+              pos,
+              match[matchIdx].length,
+              eachCb
+            );
           }
           // reset index of last match as the node changed and the
           // index isn't valid anymore http://tinyurl.com/htsudjd
@@ -554,20 +653,20 @@ class Mark {
   }
 
   /**
-   * Callback for each wrapped element
-   * @callback Mark~wrapMatchesAcrossElementsEachCallback
+   * Callback for each highlighted element
+   * @callback Mark~highlightMatchesAcrossElementsEachCallback
    * @param {HTMLElement} element - The marked DOM element
    */
   /**
-   * Filter callback before each wrapping
-   * @callback Mark~wrapMatchesAcrossElementsFilterCallback
+   * Filter callback before each highlighting
+   * @callback Mark~highlightMatchesAcrossElementsFilterCallback
    * @param {string} match - The matching string
    * @param {HTMLElement} node - The text node where the match occurs
    */
 
   /**
    * Callback on end
-   * @callback Mark~wrapMatchesAcrossElementsEndCallback
+   * @callback Mark~highlightMatchesAcrossElementsEndCallback
    */
   /**
    * Wraps the instance element and class around matches across all HTML
@@ -575,18 +674,18 @@ class Mark {
    * @param {RegExp} regex - The regular expression to be searched for
    * @param {number} ignoreGroups - A number indicating the amount of RegExp
    * matching groups to ignore
-   * @param {Mark~wrapMatchesAcrossElementsFilterCallback} filterCb
-   * @param {Mark~wrapMatchesAcrossElementsEachCallback} eachCb
-   * @param {Mark~wrapMatchesAcrossElementsEndCallback} endCb
+   * @param {Mark~highlightMatchesAcrossElementsFilterCallback} filterCb
+   * @param {Mark~highlightMatchesAcrossElementsEachCallback} eachCb
+   * @param {Mark~highlightMatchesAcrossElementsEndCallback} endCb
    * @access protected
    */
-  wrapMatchesAcrossElements(regex, ignoreGroups, filterCb, eachCb, endCb) {
+  highlightMatchesAcrossElements(regex, ignoreGroups, filterCb, eachCb, endCb) {
     const matchIdx = ignoreGroups === 0 ? 0 : ignoreGroups + 1;
     this.getTextNodes(dict => {
       let match;
       while (
         (match = regex.exec(dict.value)) !== null &&
-        match[matchIdx] !== ''
+        match[matchIdx] !== ""
       ) {
         // calculate range inside dict.value
         let start = match.index;
@@ -597,30 +696,36 @@ class Mark {
         }
         const end = start + match[matchIdx].length;
         // note that dict will be updated automatically, as it'll change
-        // in the wrapping process, due to the fact that text
+        // in the highlighting process, due to the fact that text
         // nodes will be splitted
-        this.wrapRangeInMappedTextNode(dict, start, end, node => {
-          return filterCb(match[matchIdx], node);
-        }, (node, lastIndex) => {
-          regex.lastIndex = lastIndex;
-          eachCb(node);
-        });
+        this.highlightRangeInMappedTextNode(
+          dict,
+          start,
+          end,
+          node => {
+            return filterCb(match[matchIdx], node);
+          },
+          (node, lastIndex) => {
+            regex.lastIndex = lastIndex;
+            eachCb(node);
+          }
+        );
       }
       endCb();
     });
   }
 
   /**
-   * Callback for each wrapped element
-   * @callback Mark~wrapRangeFromIndexEachCallback
+   * Callback for each highlighted element
+   * @callback Mark~highlightRangeFromIndexEachCallback
    * @param {HTMLElement} element - The marked DOM element
    * @param {Mark~rangeObject} range - the current range object; provided
    * start and length values will be numeric integers modified from the
    * provided original ranges.
    */
   /**
-   * Filter callback before each wrapping
-   * @callback Mark~wrapRangeFromIndexFilterCallback
+   * Filter callback before each highlighting
+   * @callback Mark~highlightRangeFromIndexFilterCallback
    * @param {HTMLElement} node - The text node which includes the range
    * @param {Mark~rangeObject} range - the current range object
    * @param {string} match - string extracted from the matching range
@@ -629,36 +734,42 @@ class Mark {
 
   /**
    * Callback on end
-   * @callback Mark~wrapRangeFromIndexEndCallback
+   * @callback Mark~highlightRangeFromIndexEndCallback
    */
   /**
    * Wraps the indicated ranges across all HTML elements in all contexts
    * @param {Mark~setOfRanges} ranges
-   * @param {Mark~wrapRangeFromIndexFilterCallback} filterCb
-   * @param {Mark~wrapRangeFromIndexEachCallback} eachCb
-   * @param {Mark~wrapRangeFromIndexEndCallback} endCb
+   * @param {Mark~highlightRangeFromIndexFilterCallback} filterCb
+   * @param {Mark~highlightRangeFromIndexEachCallback} eachCb
+   * @param {Mark~highlightRangeFromIndexEndCallback} endCb
    * @access protected
    */
-  wrapRangeFromIndex(ranges, filterCb, eachCb, endCb) {
+  highlightRangeFromIndex(ranges, filterCb, eachCb, endCb) {
     this.getTextNodes(dict => {
       const originalLength = dict.value.length;
       ranges.forEach((range, counter) => {
-        let {start, end, valid} = this.checkWhitespaceRanges(
+        let { start, end, valid } = this.checkWhitespaceRanges(
           range,
           originalLength,
           dict.value
         );
         if (valid) {
-          this.wrapRangeInMappedTextNode(dict, start, end, node => {
-            return filterCb(
-              node,
-              range,
-              dict.value.substring(start, end),
-              counter
-            );
-          }, node => {
-            eachCb(node, range);
-          });
+          this.highlightRangeInMappedTextNode(
+            dict,
+            start,
+            end,
+            node => {
+              return filterCb(
+                node,
+                range,
+                dict.value.substring(start, end),
+                counter
+              );
+            },
+            node => {
+              eachCb(node, range);
+            }
+          );
         }
       });
       endCb();
@@ -666,22 +777,24 @@ class Mark {
   }
 
   /**
-   * Unwraps the specified DOM node with its content (text nodes or HTML)
+   * Unhighlights the specified DOM node with its content (text nodes or HTML)
    * without destroying possibly present events (using innerHTML) and normalizes
    * the parent at the end (merge splitted text nodes)
-   * @param  {HTMLElement} node - The DOM node to unwrap
+   * @param  {HTMLElement} node - The DOM node to unhighlight
    * @access protected
    */
-  unwrapMatches(node) {
+  unhighlightMatches(node) {
     const parent = node.parentNode;
     let docFrag = document.createDocumentFragment();
     while (node.firstChild) {
       docFrag.appendChild(node.removeChild(node.firstChild));
     }
     parent.replaceChild(docFrag, node);
-    if (!this.ie) { // use browser's normalize method
+    if (!this.ie) {
+      // use browser's normalize method
       parent.normalize();
-    } else { // custom method (needs more time)
+    } else {
+      // custom method (needs more time)
       this.normalizeTextNode(parent);
     }
   }
@@ -778,23 +891,30 @@ class Mark {
   markRegExp(regexp, opt) {
     this.opt = opt;
     this.log(`Searching with expression "${regexp}"`);
-    let totalMatches = 0,
-      fn = 'wrapMatches';
+    let totalMatches = 0;
+
+    let fn = "highlightMatches";
     const eachCb = element => {
       totalMatches++;
       this.opt.each(element);
     };
     if (this.opt.acrossElements) {
-      fn = 'wrapMatchesAcrossElements';
+      fn = "highlightMatchesAcrossElements";
     }
-    this[fn](regexp, this.opt.ignoreGroups, (match, node) => {
-      return this.opt.filter(node, match, totalMatches);
-    }, eachCb, () => {
-      if (totalMatches === 0) {
-        this.opt.noMatch(regexp);
+    this[fn](
+      regexp,
+      this.opt.ignoreGroups,
+      (match, node) => {
+        return this.opt.filter(node, match, totalMatches);
+      },
+      eachCb,
+      () => {
+        if (totalMatches === 0) {
+          this.opt.noMatch(regexp);
+        }
+        this.opt.done(totalMatches);
       }
-      this.opt.done(totalMatches);
-    });
+    );
   }
 
   /**
@@ -827,23 +947,30 @@ class Mark {
    */
   mark(sv, opt) {
     this.opt = opt;
-    let totalMatches = 0,
-      fn = 'wrapMatches';
-    const {
-        keywords: kwArr,
-        length: kwArrLen
-      } = this.getSeparatedKeywords(typeof sv === 'string' ? [sv] : sv),
-      handler = kw => { // async function calls as iframes are async too
-        const regex = new RegExpCreator(this.opt).create(kw);
-        let matches = 0;
-        this.log(`Searching with expression "${regex}"`);
-        this[fn](regex, 1, (term, node) => {
+    let totalMatches = 0;
+
+    let fn = "highlightMatches";
+    const { keywords: kwArr, length: kwArrLen } = this.getSeparatedKeywords(
+      typeof sv === "string" ? [sv] : sv
+    );
+
+    const handler = kw => {
+      // async function calls as iframes are async too
+      const regex = new RegExpCreator(this.opt).create(kw);
+      let matches = 0;
+      this.log(`Searching with expression "${regex}"`);
+      this[fn](
+        regex,
+        1,
+        (term, node) => {
           return this.opt.filter(node, kw, totalMatches, matches);
-        }, element => {
+        },
+        element => {
           matches++;
           totalMatches++;
           this.opt.each(element);
-        }, () => {
+        },
+        () => {
           if (matches === 0) {
             this.opt.noMatch(kw);
           }
@@ -852,10 +979,11 @@ class Mark {
           } else {
             handler(kwArr[kwArr.indexOf(kw) + 1]);
           }
-        });
-      };
+        }
+      );
+    };
     if (this.opt.acrossElements) {
-      fn = 'wrapMatchesAcrossElements';
+      fn = "highlightMatchesAcrossElements";
     }
     if (kwArrLen === 0) {
       this.opt.done(totalMatches);
@@ -904,20 +1032,23 @@ class Mark {
    */
   markRanges(rawRanges, opt) {
     this.opt = opt;
-    let totalMatches = 0,
-      ranges = this.checkRanges(rawRanges);
+    let totalMatches = 0;
+
+    let ranges = this.checkRanges(rawRanges);
     if (ranges && ranges.length) {
       this.log(
-        'Starting to mark with the following ranges: ' +
-        JSON.stringify(ranges)
+        "Starting to mark with the following ranges: " + JSON.stringify(ranges)
       );
-      this.wrapRangeFromIndex(
-        ranges, (node, range, match, counter) => {
+      this.highlightRangeFromIndex(
+        ranges,
+        (node, range, match, counter) => {
           return this.opt.filter(node, range, match, counter);
-        }, (element, range) => {
+        },
+        (element, range) => {
           totalMatches++;
           this.opt.each(element, range);
-        }, () => {
+        },
+        () => {
           this.opt.done(totalMatches);
         }
       );
@@ -935,23 +1066,29 @@ class Mark {
    */
   unmark(opt) {
     this.opt = opt;
-    let sel = this.opt.element ? this.opt.element : '*';
-    sel += '[data-markjs]';
+    let sel = this.opt.element ? this.opt.element : "*";
+    sel += "[data-markjs]";
     if (this.opt.className) {
       sel += `.${this.opt.className}`;
     }
     this.log(`Removal selector "${sel}"`);
-    this.iterator.forEachNode(NodeFilter.SHOW_ELEMENT, node => {
-      this.unwrapMatches(node);
-    }, node => {
-      const matchesSel = DOMIterator.matches(node, sel),
-        matchesExclude = this.matchesExclude(node);
-      if (!matchesSel || matchesExclude) {
-        return NodeFilter.FILTER_REJECT;
-      } else {
-        return NodeFilter.FILTER_ACCEPT;
-      }
-    }, this.opt.done);
+    this.iterator.forEachNode(
+      NodeFilter.SHOW_ELEMENT,
+      node => {
+        this.unhighlightMatches(node);
+      },
+      node => {
+        const matchesSel = DOMIterator.matches(node, sel);
+
+        const matchesExclude = this.matchesExclude(node);
+        if (!matchesSel || matchesExclude) {
+          return NodeFilter.FILTER_REJECT;
+        } else {
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      },
+      this.opt.done
+    );
   }
 }
 

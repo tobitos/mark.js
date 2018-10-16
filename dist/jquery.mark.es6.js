@@ -1,5 +1,5 @@
 /*!***************************************************
-* mark.js v8.11.1
+* pdfmark.js v8.11.1
 * https://markjs.io/
 * Copyright (c) 2014–2018, Julian Kühnel
 * Released under the MIT license https://git.io/vwTVl
@@ -8,7 +8,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery')) :
   typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global.Mark = factory(global.jQuery));
+  (global.Pdfmark = factory(global.jQuery));
 }(this, (function ($) { 'use strict';
 
   $ = $ && $.hasOwnProperty('default') ? $['default'] : $;
@@ -470,32 +470,41 @@
     }
   }
 
+  const setAttributes = (el, attrs) => {
+    for (var key in attrs) {
+      el.setAttribute(key, attrs[key]);
+    }
+  };
   class Mark {
     constructor(ctx) {
       this.ctx = ctx;
       this.ie = false;
       const ua = window.navigator.userAgent;
-      if (ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1) {
+      if (ua.indexOf("MSIE") > -1 || ua.indexOf("Trident") > -1) {
         this.ie = true;
       }
     }
     set opt(val) {
-      this._opt = Object.assign({}, {
-        'element': '',
-        'className': '',
-        'exclude': [],
-        'iframes': false,
-        'iframesTimeout': 5000,
-        'separateWordSearch': true,
-        'acrossElements': false,
-        'ignoreGroups': 0,
-        'each': () => {},
-        'noMatch': () => {},
-        'filter': () => true,
-        'done': () => {},
-        'debug': false,
-        'log': window.console
-      }, val);
+      this._opt = Object.assign(
+        {},
+        {
+          element: "",
+          className: "",
+          exclude: [],
+          iframes: false,
+          iframesTimeout: 5000,
+          separateWordSearch: true,
+          acrossElements: false,
+          ignoreGroups: 0,
+          each: () => {},
+          noMatch: () => {},
+          filter: () => true,
+          done: () => {},
+          debug: false,
+          log: window.console
+        },
+        val
+      );
     }
     get opt() {
       return this._opt;
@@ -508,12 +517,12 @@
         this.opt.iframesTimeout
       );
     }
-    log(msg, level = 'debug') {
+    log(msg, level = "debug") {
       const log = this.opt.log;
       if (!this.opt.debug) {
         return;
       }
-      if (typeof log === 'object' && typeof log[level] === 'function') {
+      if (typeof log === "object" && typeof log[level] === "function") {
         log[level](`mark.js: ${msg}`);
       }
     }
@@ -525,7 +534,7 @@
             stack.push(kw);
           }
         } else {
-          kw.split(' ').forEach(kwSplitted => {
+          kw.split(" ").forEach(kwSplitted => {
             if (kwSplitted.trim() && stack.indexOf(kwSplitted) === -1) {
               stack.push(kwSplitted);
             }
@@ -533,10 +542,10 @@
         }
       });
       return {
-        'keywords': stack.sort((a, b) => {
+        keywords: stack.sort((a, b) => {
           return b.length - a.length;
         }),
-        'length': stack.length
+        length: stack.length
       };
     }
     isNumeric(value) {
@@ -545,9 +554,9 @@
     checkRanges(array) {
       if (
         !Array.isArray(array) ||
-        Object.prototype.toString.call(array[0]) !== '[object Object]'
+        Object.prototype.toString.call(array[0]) !== "[object Object]"
       ) {
-        this.log('markRanges() will only accept an array of objects');
+        this.log("markRanges() will only accept an array of objects");
         this.opt.noMatch(array);
         return [];
       }
@@ -558,7 +567,7 @@
           return a.start - b.start;
         })
         .forEach(item => {
-          let {start, end, valid} = this.callNoMatchOnInvalidRanges(item, last);
+          let { start, end, valid } = this.callNoMatchOnInvalidRanges(item, last);
           if (valid) {
             item.start = start;
             item.length = end - start;
@@ -569,9 +578,10 @@
       return stack;
     }
     callNoMatchOnInvalidRanges(range, last) {
-      let start, end,
-        valid = false;
-      if (range && typeof range.start !== 'undefined') {
+      let start;
+      let end;
+      let valid = false;
+      if (range && typeof range.start !== "undefined") {
         start = parseInt(range.start, 10);
         end = start + parseInt(range.length, 10);
         if (
@@ -583,8 +593,7 @@
           valid = true;
         } else {
           this.log(
-            'Ignoring invalid or overlapping range: ' +
-            `${JSON.stringify(range)}`
+            "Ignoring invalid or overlapping range: " + `${JSON.stringify(range)}`
           );
           this.opt.noMatch(range);
         }
@@ -599,11 +608,11 @@
       };
     }
     checkWhitespaceRanges(range, originalLength, string) {
-      let end,
-        valid = true,
-        max = string.length,
-        offset = originalLength - max,
-        start = parseInt(range.start, 10) - offset;
+      let end;
+      let valid = true;
+      let max = string.length;
+      let offset = originalLength - max;
+      let start = parseInt(range.start, 10) - offset;
       start = start > max ? max : start;
       end = start + parseInt(range.length, 10);
       if (end > max) {
@@ -614,9 +623,9 @@
         valid = false;
         this.log(`Invalid range: ${JSON.stringify(range)}`);
         this.opt.noMatch(range);
-      } else if (string.substring(start, end).replace(/\s+/g, '') === '') {
+      } else if (string.substring(start, end).replace(/\s+/g, "") === "") {
         valid = false;
-        this.log('Skipping whitespace only range: ' + JSON.stringify(range));
+        this.log("Skipping whitespace only range: " + JSON.stringify(range));
         this.opt.noMatch(range);
       }
       return {
@@ -626,57 +635,103 @@
       };
     }
     getTextNodes(cb) {
-      let val = '',
-        nodes = [];
-      this.iterator.forEachNode(NodeFilter.SHOW_TEXT, node => {
-        nodes.push({
-          start: val.length,
-          end: (val += node.textContent).length,
-          node
-        });
-      }, node => {
-        if (this.matchesExclude(node.parentNode)) {
-          return NodeFilter.FILTER_REJECT;
-        } else {
-          return NodeFilter.FILTER_ACCEPT;
+      let val = "";
+      let nodes = [];
+      this.iterator.forEachNode(
+        NodeFilter.SHOW_TEXT,
+        node => {
+          nodes.push({
+            start: val.length,
+            end: (val += node.textContent).length,
+            node
+          });
+        },
+        node => {
+          if (this.matchesExclude(node.parentNode)) {
+            return NodeFilter.FILTER_REJECT;
+          } else {
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        },
+        () => {
+          cb({
+            value: val,
+            nodes: nodes
+          });
         }
-      }, () => {
-        cb({
-          value: val,
-          nodes: nodes
-        });
-      });
+      );
     }
     matchesExclude(el) {
-      return DOMIterator.matches(el, this.opt.exclude.concat([
-        'script', 'style', 'title', 'head', 'html'
-      ]));
+      return DOMIterator.matches(
+        el,
+        this.opt.exclude.concat([
+          "script",
+          "style",
+          "title",
+          "head",
+          "html"
+        ])
+      );
     }
-    wrapRangeInTextNode(node, start, end) {
-      const hEl = !this.opt.element ? 'mark' : this.opt.element,
-        startNode = node.splitText(start),
-        ret = startNode.splitText(end - start);
+    wrapInHtmlTag(node, start, end) {
+      const hEl = !this.opt.element ? "mark" : this.opt.element;
+      const startNode = node.splitText(start);
+      const ret = startNode.splitText(end - start);
       let repl = document.createElement(hEl);
-      repl.setAttribute('data-markjs', 'true');
+      repl.setAttribute("data-markjs", "true");
       if (this.opt.className) {
-        repl.setAttribute('class', this.opt.className);
+        repl.setAttribute("class", this.opt.className);
       }
       repl.textContent = startNode.textContent;
       startNode.parentNode.replaceChild(repl, startNode);
       return ret;
     }
-    wrapRangeInMappedTextNode(dict, start, end, filterCb, eachCb) {
+    addSvgRectangle(node, start, end) {
+      const tspan = node.parentNode;
+      const text = node.parentNode.parentNode;
+      const g = node.parentNode.parentNode.parentNode;
+      const startNode = node.splitText(start);
+      const ret = startNode.splitText(end - start);
+      console.log("node", node, "startNode", startNode, "ret", ret);
+      let rectangle = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "rect"
+      );
+      const letterPositions = tspan.getAttribute("x").split(" ");
+      const doesWordReachEndOfBlock = end >= ret.length;
+      setAttributes(rectangle, {
+        x: `${letterPositions[start]}px`,
+        y: `${tspan.getAttribute("y") -
+        parseInt(tspan.getAttribute("font-size"))}`,
+        width: `${letterPositions[doesWordReachEndOfBlock ? end - 1 : end] -
+        letterPositions[start]}px`,
+        height: tspan.getAttribute("font-size"),
+        fill: "yellow",
+        transform: text.getAttribute("transform"),
+        "data-markjs": "true"
+      });
+      g.insertBefore(rectangle, text);
+      return ret;
+    }
+    highlightRangeInTextNode(node, start, end) {
+      console.log("node.parentNode.nodeName", node.parentNode.nodeName);
+      const isSvg = node.parentNode.nodeName === "svg:tspan";
+      return isSvg
+        ? this.addSvgRectangle(node, start, end)
+        : this.wrapInHtmlTag(node, start, end);
+    }
+    highlightRangeInMappedTextNode(dict, start, end, filterCb, eachCb) {
       dict.nodes.every((n, i) => {
         const sibl = dict.nodes[i + 1];
-        if (typeof sibl === 'undefined' || sibl.start > start) {
+        if (typeof sibl === "undefined" || sibl.start > start) {
           if (!filterCb(n.node)) {
             return false;
           }
-          const s = start - n.start,
-            e = (end > n.end ? n.end : end) - n.start,
-            startStr = dict.value.substr(0, n.start),
-            endStr = dict.value.substr(e + n.start);
-          n.node = this.wrapRangeInTextNode(n.node, s, e);
+          const s = start - n.start;
+          const e = (end > n.end ? n.end : end) - n.start;
+          const startStr = dict.value.substr(0, n.start);
+          const endStr = dict.value.substr(e + n.start);
+          n.node = this.highlightRangeInTextNode(n.node, s, e);
           dict.value = startStr + endStr;
           dict.nodes.forEach((k, j) => {
             if (j >= i) {
@@ -697,8 +752,8 @@
         return true;
       });
     }
-    wrapGroups(node, pos, len, eachCb) {
-      node = this.wrapRangeInTextNode(node, pos, pos + len);
+    highlightGroups(node, pos, len, eachCb) {
+      node = this.highlightRangeInTextNode(node, pos, pos + len);
       eachCb(node.previousSibling);
       return node;
     }
@@ -707,12 +762,12 @@
       for (let i = 1; i < matchLen; i++) {
         let pos = node.textContent.indexOf(match[i]);
         if (match[i] && pos > -1 && filterCb(match[i], node)) {
-          node = this.wrapGroups(node, pos, match[i].length, eachCb);
+          node = this.highlightGroups(node, pos, match[i].length, eachCb);
         }
       }
       return node;
     }
-    wrapMatches(regex, ignoreGroups, filterCb, eachCb, endCb) {
+    highlightMatches(regex, ignoreGroups, filterCb, eachCb, endCb) {
       const matchIdx = ignoreGroups === 0 ? 0 : ignoreGroups + 1;
       this.getTextNodes(dict => {
         dict.nodes.forEach(node => {
@@ -720,16 +775,10 @@
           let match;
           while (
             (match = regex.exec(node.textContent)) !== null &&
-            match[matchIdx] !== ''
+            match[matchIdx] !== ""
           ) {
             if (this.opt.separateGroups) {
-              node = this.separateGroups(
-                node,
-                match,
-                matchIdx,
-                filterCb,
-                eachCb
-              );
+              node = this.separateGroups(node, match, matchIdx, filterCb, eachCb);
             } else {
               if (!filterCb(match[matchIdx], node)) {
                 continue;
@@ -740,7 +789,12 @@
                   pos += match[i].length;
                 }
               }
-              node = this.wrapGroups(node, pos, match[matchIdx].length, eachCb);
+              node = this.highlightGroups(
+                node,
+                pos,
+                match[matchIdx].length,
+                eachCb
+              );
             }
             regex.lastIndex = 0;
           }
@@ -748,13 +802,13 @@
         endCb();
       });
     }
-    wrapMatchesAcrossElements(regex, ignoreGroups, filterCb, eachCb, endCb) {
+    highlightMatchesAcrossElements(regex, ignoreGroups, filterCb, eachCb, endCb) {
       const matchIdx = ignoreGroups === 0 ? 0 : ignoreGroups + 1;
       this.getTextNodes(dict => {
         let match;
         while (
           (match = regex.exec(dict.value)) !== null &&
-          match[matchIdx] !== ''
+          match[matchIdx] !== ""
         ) {
           let start = match.index;
           if (matchIdx !== 0) {
@@ -763,42 +817,54 @@
             }
           }
           const end = start + match[matchIdx].length;
-          this.wrapRangeInMappedTextNode(dict, start, end, node => {
-            return filterCb(match[matchIdx], node);
-          }, (node, lastIndex) => {
-            regex.lastIndex = lastIndex;
-            eachCb(node);
-          });
+          this.highlightRangeInMappedTextNode(
+            dict,
+            start,
+            end,
+            node => {
+              return filterCb(match[matchIdx], node);
+            },
+            (node, lastIndex) => {
+              regex.lastIndex = lastIndex;
+              eachCb(node);
+            }
+          );
         }
         endCb();
       });
     }
-    wrapRangeFromIndex(ranges, filterCb, eachCb, endCb) {
+    highlightRangeFromIndex(ranges, filterCb, eachCb, endCb) {
       this.getTextNodes(dict => {
         const originalLength = dict.value.length;
         ranges.forEach((range, counter) => {
-          let {start, end, valid} = this.checkWhitespaceRanges(
+          let { start, end, valid } = this.checkWhitespaceRanges(
             range,
             originalLength,
             dict.value
           );
           if (valid) {
-            this.wrapRangeInMappedTextNode(dict, start, end, node => {
-              return filterCb(
-                node,
-                range,
-                dict.value.substring(start, end),
-                counter
-              );
-            }, node => {
-              eachCb(node, range);
-            });
+            this.highlightRangeInMappedTextNode(
+              dict,
+              start,
+              end,
+              node => {
+                return filterCb(
+                  node,
+                  range,
+                  dict.value.substring(start, end),
+                  counter
+                );
+              },
+              node => {
+                eachCb(node, range);
+              }
+            );
           }
         });
         endCb();
       });
     }
-    unwrapMatches(node) {
+    unhighlightMatches(node) {
       const parent = node.parentNode;
       let docFrag = document.createDocumentFragment();
       while (node.firstChild) {
@@ -828,43 +894,53 @@
     markRegExp(regexp, opt) {
       this.opt = opt;
       this.log(`Searching with expression "${regexp}"`);
-      let totalMatches = 0,
-        fn = 'wrapMatches';
+      let totalMatches = 0;
+      let fn = "highlightMatches";
       const eachCb = element => {
         totalMatches++;
         this.opt.each(element);
       };
       if (this.opt.acrossElements) {
-        fn = 'wrapMatchesAcrossElements';
+        fn = "highlightMatchesAcrossElements";
       }
-      this[fn](regexp, this.opt.ignoreGroups, (match, node) => {
-        return this.opt.filter(node, match, totalMatches);
-      }, eachCb, () => {
-        if (totalMatches === 0) {
-          this.opt.noMatch(regexp);
+      this[fn](
+        regexp,
+        this.opt.ignoreGroups,
+        (match, node) => {
+          return this.opt.filter(node, match, totalMatches);
+        },
+        eachCb,
+        () => {
+          if (totalMatches === 0) {
+            this.opt.noMatch(regexp);
+          }
+          this.opt.done(totalMatches);
         }
-        this.opt.done(totalMatches);
-      });
+      );
     }
     mark(sv, opt) {
       this.opt = opt;
-      let totalMatches = 0,
-        fn = 'wrapMatches';
-      const {
-          keywords: kwArr,
-          length: kwArrLen
-        } = this.getSeparatedKeywords(typeof sv === 'string' ? [sv] : sv),
-        handler = kw => {
-          const regex = new RegExpCreator(this.opt).create(kw);
-          let matches = 0;
-          this.log(`Searching with expression "${regex}"`);
-          this[fn](regex, 1, (term, node) => {
+      let totalMatches = 0;
+      let fn = "highlightMatches";
+      const { keywords: kwArr, length: kwArrLen } = this.getSeparatedKeywords(
+        typeof sv === "string" ? [sv] : sv
+      );
+      const handler = kw => {
+        const regex = new RegExpCreator(this.opt).create(kw);
+        let matches = 0;
+        this.log(`Searching with expression "${regex}"`);
+        this[fn](
+          regex,
+          1,
+          (term, node) => {
             return this.opt.filter(node, kw, totalMatches, matches);
-          }, element => {
+          },
+          element => {
             matches++;
             totalMatches++;
             this.opt.each(element);
-          }, () => {
+          },
+          () => {
             if (matches === 0) {
               this.opt.noMatch(kw);
             }
@@ -873,10 +949,11 @@
             } else {
               handler(kwArr[kwArr.indexOf(kw) + 1]);
             }
-          });
-        };
+          }
+        );
+      };
       if (this.opt.acrossElements) {
-        fn = 'wrapMatchesAcrossElements';
+        fn = "highlightMatchesAcrossElements";
       }
       if (kwArrLen === 0) {
         this.opt.done(totalMatches);
@@ -886,20 +963,22 @@
     }
     markRanges(rawRanges, opt) {
       this.opt = opt;
-      let totalMatches = 0,
-        ranges = this.checkRanges(rawRanges);
+      let totalMatches = 0;
+      let ranges = this.checkRanges(rawRanges);
       if (ranges && ranges.length) {
         this.log(
-          'Starting to mark with the following ranges: ' +
-          JSON.stringify(ranges)
+          "Starting to mark with the following ranges: " + JSON.stringify(ranges)
         );
-        this.wrapRangeFromIndex(
-          ranges, (node, range, match, counter) => {
+        this.highlightRangeFromIndex(
+          ranges,
+          (node, range, match, counter) => {
             return this.opt.filter(node, range, match, counter);
-          }, (element, range) => {
+          },
+          (element, range) => {
             totalMatches++;
             this.opt.each(element, range);
-          }, () => {
+          },
+          () => {
             this.opt.done(totalMatches);
           }
         );
@@ -909,23 +988,28 @@
     }
     unmark(opt) {
       this.opt = opt;
-      let sel = this.opt.element ? this.opt.element : '*';
-      sel += '[data-markjs]';
+      let sel = this.opt.element ? this.opt.element : "*";
+      sel += "[data-markjs]";
       if (this.opt.className) {
         sel += `.${this.opt.className}`;
       }
       this.log(`Removal selector "${sel}"`);
-      this.iterator.forEachNode(NodeFilter.SHOW_ELEMENT, node => {
-        this.unwrapMatches(node);
-      }, node => {
-        const matchesSel = DOMIterator.matches(node, sel),
-          matchesExclude = this.matchesExclude(node);
-        if (!matchesSel || matchesExclude) {
-          return NodeFilter.FILTER_REJECT;
-        } else {
-          return NodeFilter.FILTER_ACCEPT;
-        }
-      }, this.opt.done);
+      this.iterator.forEachNode(
+        NodeFilter.SHOW_ELEMENT,
+        node => {
+          this.unhighlightMatches(node);
+        },
+        node => {
+          const matchesSel = DOMIterator.matches(node, sel);
+          const matchesExclude = this.matchesExclude(node);
+          if (!matchesSel || matchesExclude) {
+            return NodeFilter.FILTER_REJECT;
+          } else {
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        },
+        this.opt.done
+      );
     }
   }
 

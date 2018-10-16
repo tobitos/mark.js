@@ -1,5 +1,5 @@
 {
-  "name": "mark.js",
+  "name": "pdfmark.js",
   "version": "8.11.1",
   "keywords": [
     "mark.js",
@@ -20,7 +20,7 @@
     "name": "Julian Kühnel",
     "url": "https://github.com/julmot"
   },
-  "description": "Highlight keywords using JavaScript. Intended for every use case. Can e.g. be used to mark text in search results.",
+  "description": "Highlight keywords in pdfjs svg output. Based on mark.js.",
   "main": "dist/mark.js",
   "repository": "julmot/mark.js",
   "bugs": {
