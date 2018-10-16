@@ -22,7 +22,7 @@
   },
   "description": "Highlight keywords in pdfjs svg output. Based on mark.js.",
   "main": "dist/mark.js",
-  "repository": "julmot/mark.js",
+  "repository": "tobitos/pdfmark.js",
   "bugs": {
     "url": "https://github.com/julmot/mark.js/issues"
   },
