@@ -455,7 +455,7 @@ class Mark {
     // the x attribute is a set of x positions for every single
     // letter of a text block. We can use this to determine start
     // and end position of our highlight boxes
-    const letterPositions = tspan.getAttribute('x').split(' ');
+    const letterStartPositions = tspan.getAttribute('x').split(' ');
 
     // if we've already had a match in the same text block, the text
     // nodes are already split (see below). To look up the letterPositions
@@ -469,20 +469,17 @@ class Mark {
     // when there is no character coming after the last highlighted one,
     // so we're guessing the last character's width by adding the second-to-last
     // character's width.
-    const matchReachesEndOfBlock = !letterPositions[endWithOffset];
-    const width = !matchReachesEndOfBlock
-      ? parseFloat(letterPositions[endWithOffset]) -
-        parseFloat(letterPositions[startWithOffset])
-      : parseFloat(letterPositions[endWithOffset - 1]) * 2 -
-        parseFloat(letterPositions[startWithOffset]) -
-        parseFloat(letterPositions[endWithOffset - 2]);
+
+    const width =
+      tspan.getEndPositionOfChar(endWithOffset - 1).x -
+      parseFloat(letterStartPositions[startWithOffset]);
 
     const rectangle = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'rect'
     );
     setAttributes(rectangle, {
-      x: `${letterPositions[startWithOffset]}px`,
+      x: `${letterStartPositions[startWithOffset]}px`,
       y: `${tspan.getAttribute('y') -
         parseInt(tspan.getAttribute('font-size'))}`,
       width: `${width}px`,
