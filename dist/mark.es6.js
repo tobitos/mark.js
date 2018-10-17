@@ -1,5 +1,5 @@
 /*!***************************************************
-* pdfmark.js v1.1.0
+* pdfmark.js v1.2.2
 * 
 * Copyright (c) 2014–2018, Julian Kühnel
 * Released under the MIT license https://git.io/vwTVl
@@ -696,26 +696,19 @@
       const tspan = node.parentNode;
       const text = node.parentNode.parentNode;
       const g = node.parentNode.parentNode.parentNode;
-      const letterPositions = tspan.getAttribute('x').split(' ');
+      const letterStartPositions = tspan.getAttribute('x').split(' ');
       const textNodeOffset = this.getTextNodeOffset(node.previousSibling, 0);
       const startWithOffset = start + textNodeOffset;
       const endWithOffset = end + textNodeOffset;
-      const matchReachesEndOfBlock = !letterPositions[endWithOffset];
-      const width = !matchReachesEndOfBlock
-        ? parseFloat(letterPositions[endWithOffset]) -
-          parseFloat(letterPositions[startWithOffset])
-        : parseFloat(letterPositions[endWithOffset - 1]) * 2 -
-          parseFloat(letterPositions[startWithOffset]) -
-          parseFloat(letterPositions[endWithOffset - 2]);
       const rectangle = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'rect'
       );
       setAttributes(rectangle, {
-        x: `${letterPositions[startWithOffset]}px`,
+        x: `${letterStartPositions[startWithOffset]}px`,
         y: `${tspan.getAttribute('y') -
         parseInt(tspan.getAttribute('font-size'))}`,
-        width: `${width}px`,
+        width: `${tspan.getSubStringLength(startWithOffset, endWithOffset)}px`,
         height: tspan.getAttribute('font-size'),
         fill: 'yellow',
         transform: text.getAttribute('transform'),
