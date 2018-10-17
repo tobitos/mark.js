@@ -1,6 +1,6 @@
 /*!***************************************************
-* pdfmark.js v8.11.1
-* https://markjs.io/
+* pdfmark.js v1.1.0
+* 
 * Copyright (c) 2014–2018, Julian Kühnel
 * Released under the MIT license https://git.io/vwTVl
 *****************************************************/
@@ -471,7 +471,7 @@
   }
 
   const setAttributes = (el, attrs) => {
-    for (var key in attrs) {
+    for (let key in attrs) {
       el.setAttribute(key, attrs[key]);
     }
   };
@@ -480,7 +480,7 @@
       this.ctx = ctx;
       this.ie = false;
       const ua = window.navigator.userAgent;
-      if (ua.indexOf("MSIE") > -1 || ua.indexOf("Trident") > -1) {
+      if (ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1) {
         this.ie = true;
       }
     }
@@ -488,8 +488,8 @@
       this._opt = Object.assign(
         {},
         {
-          element: "",
-          className: "",
+          element: '',
+          className: '',
           exclude: [],
           iframes: false,
           iframesTimeout: 5000,
@@ -517,12 +517,12 @@
         this.opt.iframesTimeout
       );
     }
-    log(msg, level = "debug") {
+    log(msg, level = 'debug') {
       const log = this.opt.log;
       if (!this.opt.debug) {
         return;
       }
-      if (typeof log === "object" && typeof log[level] === "function") {
+      if (typeof log === 'object' && typeof log[level] === 'function') {
         log[level](`mark.js: ${msg}`);
       }
     }
@@ -534,7 +534,7 @@
             stack.push(kw);
           }
         } else {
-          kw.split(" ").forEach(kwSplitted => {
+          kw.split(' ').forEach(kwSplitted => {
             if (kwSplitted.trim() && stack.indexOf(kwSplitted) === -1) {
               stack.push(kwSplitted);
             }
@@ -554,9 +554,9 @@
     checkRanges(array) {
       if (
         !Array.isArray(array) ||
-        Object.prototype.toString.call(array[0]) !== "[object Object]"
+        Object.prototype.toString.call(array[0]) !== '[object Object]'
       ) {
-        this.log("markRanges() will only accept an array of objects");
+        this.log('markRanges() will only accept an array of objects');
         this.opt.noMatch(array);
         return [];
       }
@@ -581,7 +581,7 @@
       let start;
       let end;
       let valid = false;
-      if (range && typeof range.start !== "undefined") {
+      if (range && typeof range.start !== 'undefined') {
         start = parseInt(range.start, 10);
         end = start + parseInt(range.length, 10);
         if (
@@ -593,7 +593,7 @@
           valid = true;
         } else {
           this.log(
-            "Ignoring invalid or overlapping range: " + `${JSON.stringify(range)}`
+            'Ignoring invalid or overlapping range: ' + `${JSON.stringify(range)}`
           );
           this.opt.noMatch(range);
         }
@@ -623,9 +623,9 @@
         valid = false;
         this.log(`Invalid range: ${JSON.stringify(range)}`);
         this.opt.noMatch(range);
-      } else if (string.substring(start, end).replace(/\s+/g, "") === "") {
+      } else if (string.substring(start, end).replace(/\s+/g, '') === '') {
         valid = false;
-        this.log("Skipping whitespace only range: " + JSON.stringify(range));
+        this.log('Skipping whitespace only range: ' + JSON.stringify(range));
         this.opt.noMatch(range);
       }
       return {
@@ -635,7 +635,7 @@
       };
     }
     getTextNodes(cb) {
-      let val = "";
+      let val = '';
       let nodes = [];
       this.iterator.forEachNode(
         NodeFilter.SHOW_TEXT,
@@ -665,57 +665,68 @@
       return DOMIterator.matches(
         el,
         this.opt.exclude.concat([
-          "script",
-          "style",
-          "title",
-          "head",
-          "html"
+          'script',
+          'style',
+          'title',
+          'head',
+          'html'
         ])
       );
     }
     wrapInHtmlTag(node, start, end) {
-      const hEl = !this.opt.element ? "mark" : this.opt.element;
+      const hEl = !this.opt.element ? 'mark' : this.opt.element;
       const startNode = node.splitText(start);
       const ret = startNode.splitText(end - start);
       let repl = document.createElement(hEl);
-      repl.setAttribute("data-markjs", "true");
+      repl.setAttribute('data-markjs', 'true');
       if (this.opt.className) {
-        repl.setAttribute("class", this.opt.className);
+        repl.setAttribute('class', this.opt.className);
       }
       repl.textContent = startNode.textContent;
       startNode.parentNode.replaceChild(repl, startNode);
       return ret;
     }
+    getTextNodeOffset(node, exisitingOffset) {
+      return node
+        ? this.getTextNodeOffset(
+          node.previousSibling,
+          node.length + exisitingOffset
+        )
+        : exisitingOffset;
+    }
     addSvgRectangle(node, start, end) {
       const tspan = node.parentNode;
       const text = node.parentNode.parentNode;
       const g = node.parentNode.parentNode.parentNode;
-      const startNode = node.splitText(start);
-      const ret = startNode.splitText(end - start);
-      console.log("node", node, "startNode", startNode, "ret", ret);
+      const letterPositions = tspan.getAttribute('x').split(' ');
+      const textNodeOffset = this.getTextNodeOffset(node.previousSibling, 0);
+      const startWithOffset = start + textNodeOffset;
+      const endWithOffset = end + textNodeOffset;
+      const doesWordReachEndOfBlock = endWithOffset >= node.wholeText.length;
       let rectangle = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "rect"
+        'http://www.w3.org/2000/svg',
+        'rect'
       );
-      const letterPositions = tspan.getAttribute("x").split(" ");
-      const doesWordReachEndOfBlock = end >= ret.length;
       setAttributes(rectangle, {
-        x: `${letterPositions[start]}px`,
-        y: `${tspan.getAttribute("y") -
-        parseInt(tspan.getAttribute("font-size"))}`,
-        width: `${letterPositions[doesWordReachEndOfBlock ? end - 1 : end] -
-        letterPositions[start]}px`,
-        height: tspan.getAttribute("font-size"),
-        fill: "yellow",
-        transform: text.getAttribute("transform"),
-        "data-markjs": "true"
+        x: `${letterPositions[startWithOffset]}px`,
+        y: `${tspan.getAttribute('y') -
+        parseInt(tspan.getAttribute('font-size'))}`,
+        width: `${letterPositions[
+        doesWordReachEndOfBlock ? endWithOffset - 1 : endWithOffset
+      ] - letterPositions[startWithOffset]}px`,
+        height: tspan.getAttribute('font-size'),
+        fill: 'yellow',
+        transform: text.getAttribute('transform'),
+        'data-markjs': 'true'
       });
       g.insertBefore(rectangle, text);
+      const startNode = node.splitText(start);
+      const ret = startNode.splitText(end - start);
       return ret;
     }
     highlightRangeInTextNode(node, start, end) {
-      console.log("node.parentNode.nodeName", node.parentNode.nodeName);
-      const isSvg = node.parentNode.nodeName === "svg:tspan";
+      console.log('node.parentNode.nodeName', node.parentNode.nodeName);
+      const isSvg = node.parentNode.nodeName === 'svg:tspan';
       return isSvg
         ? this.addSvgRectangle(node, start, end)
         : this.wrapInHtmlTag(node, start, end);
@@ -723,7 +734,7 @@
     highlightRangeInMappedTextNode(dict, start, end, filterCb, eachCb) {
       dict.nodes.every((n, i) => {
         const sibl = dict.nodes[i + 1];
-        if (typeof sibl === "undefined" || sibl.start > start) {
+        if (typeof sibl === 'undefined' || sibl.start > start) {
           if (!filterCb(n.node)) {
             return false;
           }
@@ -775,7 +786,7 @@
           let match;
           while (
             (match = regex.exec(node.textContent)) !== null &&
-            match[matchIdx] !== ""
+            match[matchIdx] !== ''
           ) {
             if (this.opt.separateGroups) {
               node = this.separateGroups(node, match, matchIdx, filterCb, eachCb);
@@ -808,7 +819,7 @@
         let match;
         while (
           (match = regex.exec(dict.value)) !== null &&
-          match[matchIdx] !== ""
+          match[matchIdx] !== ''
         ) {
           let start = match.index;
           if (matchIdx !== 0) {
@@ -895,13 +906,13 @@
       this.opt = opt;
       this.log(`Searching with expression "${regexp}"`);
       let totalMatches = 0;
-      let fn = "highlightMatches";
+      let fn = 'highlightMatches';
       const eachCb = element => {
         totalMatches++;
         this.opt.each(element);
       };
       if (this.opt.acrossElements) {
-        fn = "highlightMatchesAcrossElements";
+        fn = 'highlightMatchesAcrossElements';
       }
       this[fn](
         regexp,
@@ -921,9 +932,9 @@
     mark(sv, opt) {
       this.opt = opt;
       let totalMatches = 0;
-      let fn = "highlightMatches";
+      let fn = 'highlightMatches';
       const { keywords: kwArr, length: kwArrLen } = this.getSeparatedKeywords(
-        typeof sv === "string" ? [sv] : sv
+        typeof sv === 'string' ? [sv] : sv
       );
       const handler = kw => {
         const regex = new RegExpCreator(this.opt).create(kw);
@@ -953,7 +964,7 @@
         );
       };
       if (this.opt.acrossElements) {
-        fn = "highlightMatchesAcrossElements";
+        fn = 'highlightMatchesAcrossElements';
       }
       if (kwArrLen === 0) {
         this.opt.done(totalMatches);
@@ -967,7 +978,7 @@
       let ranges = this.checkRanges(rawRanges);
       if (ranges && ranges.length) {
         this.log(
-          "Starting to mark with the following ranges: " + JSON.stringify(ranges)
+          'Starting to mark with the following ranges: ' + JSON.stringify(ranges)
         );
         this.highlightRangeFromIndex(
           ranges,
@@ -988,8 +999,8 @@
     }
     unmark(opt) {
       this.opt = opt;
-      let sel = this.opt.element ? this.opt.element : "*";
-      sel += "[data-markjs]";
+      let sel = this.opt.element ? this.opt.element : '*';
+      sel += '[data-markjs]';
       if (this.opt.className) {
         sel += `.${this.opt.className}`;
       }

@@ -1,8 +1,8 @@
-import DOMIterator from "./domiterator";
-import RegExpCreator from "./regexpcreator";
+import DOMIterator from './domiterator';
+import RegExpCreator from './regexpcreator';
 
 const setAttributes = (el, attrs) => {
-  for (var key in attrs) {
+  for (let key in attrs) {
     el.setAttribute(key, attrs[key]);
   }
 };
@@ -37,7 +37,7 @@ class Mark {
      */
     this.ie = false;
     const ua = window.navigator.userAgent;
-    if (ua.indexOf("MSIE") > -1 || ua.indexOf("Trident") > -1) {
+    if (ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1) {
       this.ie = true;
     }
   }
@@ -54,8 +54,8 @@ class Mark {
     this._opt = Object.assign(
       {},
       {
-        element: "",
-        className: "",
+        element: '',
+        className: '',
         exclude: [],
         iframes: false,
         iframesTimeout: 5000,
@@ -99,12 +99,12 @@ class Mark {
    * <code>error</code>, <code>debug</code>
    * @access protected
    */
-  log(msg, level = "debug") {
+  log(msg, level = 'debug') {
     const log = this.opt.log;
     if (!this.opt.debug) {
       return;
     }
-    if (typeof log === "object" && typeof log[level] === "function") {
+    if (typeof log === 'object' && typeof log[level] === 'function') {
       log[level](`mark.js: ${msg}`);
     }
   }
@@ -130,7 +130,7 @@ class Mark {
           stack.push(kw);
         }
       } else {
-        kw.split(" ").forEach(kwSplitted => {
+        kw.split(' ').forEach(kwSplitted => {
           if (kwSplitted.trim() && stack.indexOf(kwSplitted) === -1) {
             stack.push(kwSplitted);
           }
@@ -187,9 +187,9 @@ class Mark {
     // quick validity check of the first entry only
     if (
       !Array.isArray(array) ||
-      Object.prototype.toString.call(array[0]) !== "[object Object]"
+      Object.prototype.toString.call(array[0]) !== '[object Object]'
     ) {
-      this.log("markRanges() will only accept an array of objects");
+      this.log('markRanges() will only accept an array of objects');
       this.opt.noMatch(array);
       return [];
     }
@@ -237,7 +237,7 @@ class Mark {
     let end;
 
     let valid = false;
-    if (range && typeof range.start !== "undefined") {
+    if (range && typeof range.start !== 'undefined') {
       start = parseInt(range.start, 10);
       end = start + parseInt(range.length, 10);
       // ignore overlapping values & non-numeric entries
@@ -250,7 +250,7 @@ class Mark {
         valid = true;
       } else {
         this.log(
-          "Ignoring invalid or overlapping range: " + `${JSON.stringify(range)}`
+          'Ignoring invalid or overlapping range: ' + `${JSON.stringify(range)}`
         );
         this.opt.noMatch(range);
       }
@@ -301,10 +301,10 @@ class Mark {
       valid = false;
       this.log(`Invalid range: ${JSON.stringify(range)}`);
       this.opt.noMatch(range);
-    } else if (string.substring(start, end).replace(/\s+/g, "") === "") {
+    } else if (string.substring(start, end).replace(/\s+/g, '') === '') {
       valid = false;
       // whitespace only; even if highlighted it is not visible
-      this.log("Skipping whitespace only range: " + JSON.stringify(range));
+      this.log('Skipping whitespace only range: ' + JSON.stringify(range));
       this.opt.noMatch(range);
     }
     return {
@@ -339,7 +339,7 @@ class Mark {
    * @access protected
    */
   getTextNodes(cb) {
-    let val = "";
+    let val = '';
 
     let nodes = [];
     this.iterator.forEachNode(
@@ -380,11 +380,11 @@ class Mark {
       el,
       this.opt.exclude.concat([
         // ignores the elements itself, not their childrens (selector *)
-        "script",
-        "style",
-        "title",
-        "head",
-        "html"
+        'script',
+        'style',
+        'title',
+        'head',
+        'html'
       ])
     );
   }
@@ -400,20 +400,38 @@ class Mark {
    * @access protected
    */
   wrapInHtmlTag(node, start, end) {
-    const hEl = !this.opt.element ? "mark" : this.opt.element;
+    const hEl = !this.opt.element ? 'mark' : this.opt.element;
 
     const startNode = node.splitText(start);
 
     const ret = startNode.splitText(end - start);
     let repl = document.createElement(hEl);
-    repl.setAttribute("data-markjs", "true");
+    repl.setAttribute('data-markjs', 'true');
     if (this.opt.className) {
-      repl.setAttribute("class", this.opt.className);
+      repl.setAttribute('class', this.opt.className);
     }
     repl.textContent = startNode.textContent;
     startNode.parentNode.replaceChild(repl, startNode);
 
     return ret;
+  }
+
+  /**
+   * Recursive function to get the length of all the text of
+   * previous siblings
+   * @param  {HTMLElement} node - The DOM text node
+   * @param  {number} existingOffset - accumulated length of all previously
+   * checked text nodes
+   * @return {number} accumulated length
+   * @access protected
+   */
+  getTextNodeOffset(node, exisitingOffset) {
+    return node
+      ? this.getTextNodeOffset(
+        node.previousSibling,
+        node.length + exisitingOffset
+      )
+      : exisitingOffset;
   }
 
   /**
@@ -428,37 +446,52 @@ class Mark {
    * @access protected
    */
   addSvgRectangle(node, start, end) {
+    // these nodes are specific to pdfjs' svg output where all text nodes are wrapped:
+    // <svg:g><svg:text><svg:tspan>{text}</svg:tspan></svg:text></svg:g>
     const tspan = node.parentNode;
     const text = node.parentNode.parentNode;
     const g = node.parentNode.parentNode.parentNode;
 
-    const startNode = node.splitText(start);
-    const ret = startNode.splitText(end - start);
-    console.log("node", node, "startNode", startNode, "ret", ret);
+    // the x attribute is a set of x positions for every single
+    // letter of a text block. We can use this to determine start
+    // and end position of our highlight boxes
+    const letterPositions = tspan.getAttribute('x').split(' ');
+
+    // if we've already had a match in the same text block, the text
+    // nodes are already split (see below). To look up the letterPositions
+    // we need to know the full offset of out start and end positions
+    const textNodeOffset = this.getTextNodeOffset(node.previousSibling, 0);
+    const startWithOffset = start + textNodeOffset;
+    const endWithOffset = end + textNodeOffset;
+
+    // we're always drawing the rectangle up to the start position of the
+    // first character that shouldn't be highlighted. This obviously is a problem
+    // when there is no further character, so we need to check for this case.
+    const doesWordReachEndOfBlock = endWithOffset >= node.wholeText.length;
 
     let rectangle = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "rect"
+      'http://www.w3.org/2000/svg',
+      'rect'
     );
-
-    const letterPositions = tspan.getAttribute("x").split(" ");
-
-    const doesWordReachEndOfBlock = end >= ret.length;
-
     setAttributes(rectangle, {
-      x: `${letterPositions[start]}px`,
-      y: `${tspan.getAttribute("y") -
-        parseInt(tspan.getAttribute("font-size"))}`,
-      width: `${letterPositions[doesWordReachEndOfBlock ? end - 1 : end] -
-        letterPositions[start]}px`,
-      height: tspan.getAttribute("font-size"),
-      fill: "yellow",
-      transform: text.getAttribute("transform"),
-      "data-markjs": "true"
+      x: `${letterPositions[startWithOffset]}px`,
+      y: `${tspan.getAttribute('y') -
+        parseInt(tspan.getAttribute('font-size'))}`,
+      width: `${letterPositions[
+        doesWordReachEndOfBlock ? endWithOffset - 1 : endWithOffset
+      ] - letterPositions[startWithOffset]}px`,
+      height: tspan.getAttribute('font-size'),
+      fill: 'yellow',
+      transform: text.getAttribute('transform'),
+      'data-markjs': 'true'
     });
 
     g.insertBefore(rectangle, text);
 
+    // the library usually splits the text and adds <mark> tags around matches.
+    // Remove the splitting would break the search functionality.
+    const startNode = node.splitText(start);
+    const ret = startNode.splitText(end - start);
     return ret;
   }
 
@@ -473,8 +506,8 @@ class Mark {
    * @access protected
    */
   highlightRangeInTextNode(node, start, end) {
-    console.log("node.parentNode.nodeName", node.parentNode.nodeName);
-    const isSvg = node.parentNode.nodeName === "svg:tspan";
+    console.log('node.parentNode.nodeName', node.parentNode.nodeName);
+    const isSvg = node.parentNode.nodeName === 'svg:tspan';
     return isSvg
       ? this.addSvgRectangle(node, start, end)
       : this.wrapInHtmlTag(node, start, end);
@@ -519,7 +552,7 @@ class Mark {
     // iterate over all text nodes to find the one matching the positions
     dict.nodes.every((n, i) => {
       const sibl = dict.nodes[i + 1];
-      if (typeof sibl === "undefined" || sibl.start > start) {
+      if (typeof sibl === 'undefined' || sibl.start > start) {
         if (!filterCb(n.node)) {
           return false;
         }
@@ -622,7 +655,7 @@ class Mark {
         let match;
         while (
           (match = regex.exec(node.textContent)) !== null &&
-          match[matchIdx] !== ""
+          match[matchIdx] !== ''
         ) {
           if (this.opt.separateGroups) {
             node = this.separateGroups(node, match, matchIdx, filterCb, eachCb);
@@ -685,7 +718,7 @@ class Mark {
       let match;
       while (
         (match = regex.exec(dict.value)) !== null &&
-        match[matchIdx] !== ""
+        match[matchIdx] !== ''
       ) {
         // calculate range inside dict.value
         let start = match.index;
@@ -893,13 +926,13 @@ class Mark {
     this.log(`Searching with expression "${regexp}"`);
     let totalMatches = 0;
 
-    let fn = "highlightMatches";
+    let fn = 'highlightMatches';
     const eachCb = element => {
       totalMatches++;
       this.opt.each(element);
     };
     if (this.opt.acrossElements) {
-      fn = "highlightMatchesAcrossElements";
+      fn = 'highlightMatchesAcrossElements';
     }
     this[fn](
       regexp,
@@ -949,9 +982,9 @@ class Mark {
     this.opt = opt;
     let totalMatches = 0;
 
-    let fn = "highlightMatches";
+    let fn = 'highlightMatches';
     const { keywords: kwArr, length: kwArrLen } = this.getSeparatedKeywords(
-      typeof sv === "string" ? [sv] : sv
+      typeof sv === 'string' ? [sv] : sv
     );
 
     const handler = kw => {
@@ -983,7 +1016,7 @@ class Mark {
       );
     };
     if (this.opt.acrossElements) {
-      fn = "highlightMatchesAcrossElements";
+      fn = 'highlightMatchesAcrossElements';
     }
     if (kwArrLen === 0) {
       this.opt.done(totalMatches);
@@ -1037,7 +1070,7 @@ class Mark {
     let ranges = this.checkRanges(rawRanges);
     if (ranges && ranges.length) {
       this.log(
-        "Starting to mark with the following ranges: " + JSON.stringify(ranges)
+        'Starting to mark with the following ranges: ' + JSON.stringify(ranges)
       );
       this.highlightRangeFromIndex(
         ranges,
@@ -1066,8 +1099,8 @@ class Mark {
    */
   unmark(opt) {
     this.opt = opt;
-    let sel = this.opt.element ? this.opt.element : "*";
-    sel += "[data-markjs]";
+    let sel = this.opt.element ? this.opt.element : '*';
+    sel += '[data-markjs]';
     if (this.opt.className) {
       sel += `.${this.opt.className}`;
     }
