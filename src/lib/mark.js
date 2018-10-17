@@ -464,16 +464,6 @@ class Mark {
     const startWithOffset = start + textNodeOffset;
     const endWithOffset = end + textNodeOffset;
 
-    // we're always drawing the rectangle up to the position of the
-    // first character that shouldn't be highlighted. This obviously is a problem
-    // when there is no character coming after the last highlighted one,
-    // so we're guessing the last character's width by adding the second-to-last
-    // character's width.
-
-    const width =
-      tspan.getEndPositionOfChar(endWithOffset - 1).x -
-      parseFloat(letterStartPositions[startWithOffset]);
-
     const rectangle = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'rect'
@@ -482,7 +472,7 @@ class Mark {
       x: `${letterStartPositions[startWithOffset]}px`,
       y: `${tspan.getAttribute('y') -
         parseInt(tspan.getAttribute('font-size'))}`,
-      width: `${width}px`,
+      width: `${tspan.getSubStringLength(startWithOffset, endWithOffset)}px`,
       height: tspan.getAttribute('font-size'),
       fill: 'yellow',
       transform: text.getAttribute('transform'),
