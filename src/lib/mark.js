@@ -464,12 +464,20 @@ class Mark {
     const startWithOffset = start + textNodeOffset;
     const endWithOffset = end + textNodeOffset;
 
-    // we're always drawing the rectangle up to the start position of the
+    // we're always drawing the rectangle up to the position of the
     // first character that shouldn't be highlighted. This obviously is a problem
-    // when there is no further character, so we need to check for this case.
-    const doesWordReachEndOfBlock = endWithOffset >= node.wholeText.length;
+    // when there is no character coming after the last highlighted one,
+    // so we're guessing the last character's width by adding the second-to-last
+    // character's width.
+    const matchReachesEndOfBlock = !letterPositions[endWithOffset];
+    const width = !matchReachesEndOfBlock
+      ? parseFloat(letterPositions[endWithOffset]) -
+        parseFloat(letterPositions[startWithOffset])
+      : parseFloat(letterPositions[endWithOffset - 1]) * 2 -
+        parseFloat(letterPositions[startWithOffset]) -
+        parseFloat(letterPositions[endWithOffset - 2]);
 
-    let rectangle = document.createElementNS(
+    const rectangle = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'rect'
     );
@@ -477,9 +485,7 @@ class Mark {
       x: `${letterPositions[startWithOffset]}px`,
       y: `${tspan.getAttribute('y') -
         parseInt(tspan.getAttribute('font-size'))}`,
-      width: `${letterPositions[
-        doesWordReachEndOfBlock ? endWithOffset - 1 : endWithOffset
-      ] - letterPositions[startWithOffset]}px`,
+      width: `${width}px`,
       height: tspan.getAttribute('font-size'),
       fill: 'yellow',
       transform: text.getAttribute('transform'),
