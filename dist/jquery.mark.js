@@ -1,5 +1,5 @@
 /*!***************************************************
-* pdfmark.js v1.2.2
+* pdfmark.js v1.2.3
 * 
 * Copyright (c) 2014–2018, Julian Kühnel
 * Released under the MIT license https://git.io/vwTVl
@@ -769,7 +769,7 @@
         setAttributes(rectangle, {
           x: letterStartPositions[startWithOffset] + 'px',
           y: '' + (tspan.getAttribute('y') - parseInt(tspan.getAttribute('font-size'))),
-          width: tspan.getSubStringLength(startWithOffset, endWithOffset) + 'px',
+          width: tspan.getEndPositionOfChar(endWithOffset - 1).x - parseFloat(letterStartPositions[startWithOffset]) + 'px',
           height: tspan.getAttribute('font-size'),
           fill: 'yellow',
           transform: text.getAttribute('transform'),
