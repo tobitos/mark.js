@@ -512,9 +512,8 @@ class Mark {
    * @access protected
    */
   highlightRangeInTextNode(node, start, end) {
-    console.log('node.parentNode.nodeName', node.parentNode.nodeName);
-    const isSvg = node.parentNode.nodeName === 'svg:tspan';
-    return isSvg
+    const isPdfjsSvgOutput = node.parentNode.nodeName === 'svg:tspan';
+    return isPdfjsSvgOutput
       ? this.addSvgRectangle(node, start, end)
       : this.wrapInHtmlTag(node, start, end);
   }

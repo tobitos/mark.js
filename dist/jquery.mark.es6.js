@@ -702,8 +702,14 @@
       const textNodeOffset = this.getTextNodeOffset(node.previousSibling, 0);
       const startWithOffset = start + textNodeOffset;
       const endWithOffset = end + textNodeOffset;
-      const doesWordReachEndOfBlock = endWithOffset >= node.wholeText.length;
-      let rectangle = document.createElementNS(
+      const matchReachesEndOfBlock = !letterPositions[endWithOffset];
+      const width = !matchReachesEndOfBlock
+        ? parseFloat(letterPositions[endWithOffset]) -
+          parseFloat(letterPositions[startWithOffset])
+        : parseFloat(letterPositions[endWithOffset - 1]) * 2 -
+          parseFloat(letterPositions[startWithOffset]) -
+          parseFloat(letterPositions[endWithOffset - 2]);
+      const rectangle = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'rect'
       );
@@ -711,9 +717,7 @@
         x: `${letterPositions[startWithOffset]}px`,
         y: `${tspan.getAttribute('y') -
         parseInt(tspan.getAttribute('font-size'))}`,
-        width: `${letterPositions[
-        doesWordReachEndOfBlock ? endWithOffset - 1 : endWithOffset
-      ] - letterPositions[startWithOffset]}px`,
+        width: `${width}px`,
         height: tspan.getAttribute('font-size'),
         fill: 'yellow',
         transform: text.getAttribute('transform'),
@@ -725,9 +729,8 @@
       return ret;
     }
     highlightRangeInTextNode(node, start, end) {
-      console.log('node.parentNode.nodeName', node.parentNode.nodeName);
-      const isSvg = node.parentNode.nodeName === 'svg:tspan';
-      return isSvg
+      const isPdfjsSvgOutput = node.parentNode.nodeName === 'svg:tspan';
+      return isPdfjsSvgOutput
         ? this.addSvgRectangle(node, start, end)
         : this.wrapInHtmlTag(node, start, end);
     }
