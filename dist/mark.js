@@ -1,5 +1,5 @@
 /*!***************************************************
-* pdfmark.js v1.1.0
+* pdfmark.js v1.2.3
 * 
 * Copyright (c) 2014–2018, Julian Kühnel
 * Released under the MIT license https://git.io/vwTVl
@@ -759,16 +759,15 @@
         var tspan = node.parentNode;
         var text = node.parentNode.parentNode;
         var g = node.parentNode.parentNode.parentNode;
-        var letterPositions = tspan.getAttribute('x').split(' ');
+        var letterStartPositions = tspan.getAttribute('x').split(' ');
         var textNodeOffset = this.getTextNodeOffset(node.previousSibling, 0);
         var startWithOffset = start + textNodeOffset;
         var endWithOffset = end + textNodeOffset;
-        var doesWordReachEndOfBlock = endWithOffset >= node.wholeText.length;
         var rectangle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         setAttributes(rectangle, {
-          x: letterPositions[startWithOffset] + 'px',
+          x: letterStartPositions[startWithOffset] + 'px',
           y: '' + (tspan.getAttribute('y') - parseInt(tspan.getAttribute('font-size'))),
-          width: letterPositions[doesWordReachEndOfBlock ? endWithOffset - 1 : endWithOffset] - letterPositions[startWithOffset] + 'px',
+          width: tspan.getEndPositionOfChar(endWithOffset - 1).x - parseFloat(letterStartPositions[startWithOffset]) + 'px',
           height: tspan.getAttribute('font-size'),
           fill: 'yellow',
           transform: text.getAttribute('transform'),
@@ -782,9 +781,8 @@
     }, {
       key: 'highlightRangeInTextNode',
       value: function highlightRangeInTextNode(node, start, end) {
-        console.log('node.parentNode.nodeName', node.parentNode.nodeName);
-        var isSvg = node.parentNode.nodeName === 'svg:tspan';
-        return isSvg ? this.addSvgRectangle(node, start, end) : this.wrapInHtmlTag(node, start, end);
+        var isPdfjsSvgOutput = node.parentNode.nodeName === 'svg:tspan';
+        return isPdfjsSvgOutput ? this.addSvgRectangle(node, start, end) : this.wrapInHtmlTag(node, start, end);
       }
     }, {
       key: 'highlightRangeInMappedTextNode',

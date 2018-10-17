@@ -1,5 +1,5 @@
 /*!***************************************************
-* pdfmark.js v1.1.0
+* pdfmark.js v1.2.3
 * 
 * Copyright (c) 2014–2018, Julian Kühnel
 * Released under the MIT license https://git.io/vwTVl
@@ -698,22 +698,20 @@
       const tspan = node.parentNode;
       const text = node.parentNode.parentNode;
       const g = node.parentNode.parentNode.parentNode;
-      const letterPositions = tspan.getAttribute('x').split(' ');
+      const letterStartPositions = tspan.getAttribute('x').split(' ');
       const textNodeOffset = this.getTextNodeOffset(node.previousSibling, 0);
       const startWithOffset = start + textNodeOffset;
       const endWithOffset = end + textNodeOffset;
-      const doesWordReachEndOfBlock = endWithOffset >= node.wholeText.length;
-      let rectangle = document.createElementNS(
+      const rectangle = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'rect'
       );
       setAttributes(rectangle, {
-        x: `${letterPositions[startWithOffset]}px`,
+        x: `${letterStartPositions[startWithOffset]}px`,
         y: `${tspan.getAttribute('y') -
         parseInt(tspan.getAttribute('font-size'))}`,
-        width: `${letterPositions[
-        doesWordReachEndOfBlock ? endWithOffset - 1 : endWithOffset
-      ] - letterPositions[startWithOffset]}px`,
+        width: `${tspan.getEndPositionOfChar(endWithOffset - 1).x -
+        parseFloat(letterStartPositions[startWithOffset])}px`,
         height: tspan.getAttribute('font-size'),
         fill: 'yellow',
         transform: text.getAttribute('transform'),
@@ -725,9 +723,8 @@
       return ret;
     }
     highlightRangeInTextNode(node, start, end) {
-      console.log('node.parentNode.nodeName', node.parentNode.nodeName);
-      const isSvg = node.parentNode.nodeName === 'svg:tspan';
-      return isSvg
+      const isPdfjsSvgOutput = node.parentNode.nodeName === 'svg:tspan';
+      return isPdfjsSvgOutput
         ? this.addSvgRectangle(node, start, end)
         : this.wrapInHtmlTag(node, start, end);
     }

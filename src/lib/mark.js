@@ -455,7 +455,7 @@ class Mark {
     // the x attribute is a set of x positions for every single
     // letter of a text block. We can use this to determine start
     // and end position of our highlight boxes
-    const letterPositions = tspan.getAttribute('x').split(' ');
+    const letterStartPositions = tspan.getAttribute('x').split(' ');
 
     // if we've already had a match in the same text block, the text
     // nodes are already split (see below). To look up the letterPositions
@@ -464,22 +464,16 @@ class Mark {
     const startWithOffset = start + textNodeOffset;
     const endWithOffset = end + textNodeOffset;
 
-    // we're always drawing the rectangle up to the start position of the
-    // first character that shouldn't be highlighted. This obviously is a problem
-    // when there is no further character, so we need to check for this case.
-    const doesWordReachEndOfBlock = endWithOffset >= node.wholeText.length;
-
-    let rectangle = document.createElementNS(
+    const rectangle = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'rect'
     );
     setAttributes(rectangle, {
-      x: `${letterPositions[startWithOffset]}px`,
+      x: `${letterStartPositions[startWithOffset]}px`,
       y: `${tspan.getAttribute('y') -
         parseInt(tspan.getAttribute('font-size'))}`,
-      width: `${letterPositions[
-        doesWordReachEndOfBlock ? endWithOffset - 1 : endWithOffset
-      ] - letterPositions[startWithOffset]}px`,
+      width: `${tspan.getEndPositionOfChar(endWithOffset - 1).x -
+        parseFloat(letterStartPositions[startWithOffset])}px`,
       height: tspan.getAttribute('font-size'),
       fill: 'yellow',
       transform: text.getAttribute('transform'),
@@ -506,9 +500,8 @@ class Mark {
    * @access protected
    */
   highlightRangeInTextNode(node, start, end) {
-    console.log('node.parentNode.nodeName', node.parentNode.nodeName);
-    const isSvg = node.parentNode.nodeName === 'svg:tspan';
-    return isSvg
+    const isPdfjsSvgOutput = node.parentNode.nodeName === 'svg:tspan';
+    return isPdfjsSvgOutput
       ? this.addSvgRectangle(node, start, end)
       : this.wrapInHtmlTag(node, start, end);
   }
