@@ -479,8 +479,19 @@ class Mark {
       transform: text.getAttribute('transform'),
       'data-markjs': 'true'
     });
-
     g.insertBefore(rectangle, text);
+
+    const blackTextOnTop = tspan.cloneNode(true);
+    setAttributes(blackTextOnTop, {
+      x: letterStartPositions.slice(startWithOffset, endWithOffset).join(' '),
+      fill: 'black',
+      'data-markjs': 'true'
+    });
+    blackTextOnTop.textContent = tspan.textContent.slice(
+      startWithOffset,
+      endWithOffset
+    );
+    text.insertBefore(blackTextOnTop, tspan.nextSibling);
 
     // the library usually splits the text and adds <mark> tags around matches.
     // Remove the splitting would break the search functionality.
@@ -813,7 +824,11 @@ class Mark {
     const parent = node.parentNode;
     let docFrag = document.createDocumentFragment();
     while (node.firstChild) {
-      docFrag.appendChild(node.removeChild(node.firstChild));
+      if (parent.nodeName === 'svg:text') {
+        node.removeChild(node.firstChild);
+      } else {
+        docFrag.appendChild(node.removeChild(node.firstChild));
+      }
     }
     parent.replaceChild(docFrag, node);
     if (!this.ie) {

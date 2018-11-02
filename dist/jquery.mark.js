@@ -1,5 +1,5 @@
 /*!***************************************************
-* pdfmark.js v1.2.3
+* pdfmark.js v1.2.4
 * 
 * Copyright (c) 2014–2018, Julian Kühnel
 * Released under the MIT license https://git.io/vwTVl
@@ -776,6 +776,14 @@
           'data-markjs': 'true'
         });
         g.insertBefore(rectangle, text);
+        var blackTextOnTop = tspan.cloneNode(true);
+        setAttributes(blackTextOnTop, {
+          x: letterStartPositions.slice(startWithOffset, endWithOffset).join(' '),
+          fill: 'black',
+          'data-markjs': 'true'
+        });
+        blackTextOnTop.textContent = tspan.textContent.slice(startWithOffset, endWithOffset);
+        text.insertBefore(blackTextOnTop, tspan.nextSibling);
         var startNode = node.splitText(start);
         var ret = startNode.splitText(end - start);
         return ret;
@@ -928,7 +936,11 @@
         var parent = node.parentNode;
         var docFrag = document.createDocumentFragment();
         while (node.firstChild) {
-          docFrag.appendChild(node.removeChild(node.firstChild));
+          if (parent.nodeName === 'svg:text') {
+            node.removeChild(node.firstChild);
+          } else {
+            docFrag.appendChild(node.removeChild(node.firstChild));
+          }
         }
         parent.replaceChild(docFrag, node);
         if (!this.ie) {
